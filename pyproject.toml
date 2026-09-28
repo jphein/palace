@@ -1,0 +1,14 @@
+[project]
+name = "palace-nemotron"
+version = "0.0.1"
+description = "A private, always-on personal AI with a real long-term memory, running on NVIDIA Nemotron via Nebius Token Factory."
+license = { text = "AGPL-3.0-or-later" }
+authors = [{ name = "Jeffrey Pine Hein" }]
+requires-python = ">=3.11"
+dependencies = []   # stdlib only; memory lives in palace-daemon (MIT) over HTTP
+
+[project.scripts]
+palace = "palace.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

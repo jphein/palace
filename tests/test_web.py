@@ -1,0 +1,123 @@
+import json
+import threading
+import urllib.error
+import urllib.request
+from http.server import ThreadingHTTPServer
+
+import pytest
+
+from palace.config import Config
+from palace.memory import DemoMemory
+from palace.web import make_handler
+
+
+def _server(chat):
+    cfg = Config.from_env({})
+    httpd = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(cfg, DemoMemory(), chat))
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    return httpd, f"http://127.0.0.1:{httpd.server_address[1]}"
+
+
+@pytest.fixture
+def preview():
+    httpd, base = _server(None)
+    yield base
+    httpd.shutdown()
+
+
+def _get(url):
+    with urllib.request.urlopen(url, timeout=5) as r:
+        return r.status, r.headers, r.read()
+
+
+def _post(url, body: bytes):
+    req = urllib.request.Request(url, data=body, method="POST", headers={"content-type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=5) as r:
+            return r.status, json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        return e.code, json.loads(e.read())
+
+
+def test_page_favicon_and_status(preview):
+    code, headers, body = _get(preview + "/")
+    assert code == 200 and b"What leaves the house" in body and b'rel="icon"' in body
+    assert "frame-ancestors 'none'" in headers["content-security-policy"]
+    assert _get(preview + "/favicon.svg")[1]["content-type"] == "image/svg+xml"
+    status = json.loads(_get(preview + "/api/status")[2])
+    assert status["mode"] == "preview" and "synthetic" in status["memory"]
+    assert "name" in json.loads(_get(preview + "/version")[2])
+
+
+def test_preview_ask_sends_nothing_but_shows_payload(preview):
+    code, t = _post(preview + "/api/ask", json.dumps({"question": "When is the next county report due?"}).encode())
+    assert code == 200 and t["mode"] == "preview" and t["answer"] is None
+    assert t["route"]["tier"] == "nano" and t["egress"]["sent"] is False
+    ids = [s["id"] for s in t["egress"]["snippets"]]
+    assert "demo-019" in ids
+    user_msg = t["egress"]["messages"][1]["content"]
+    assert all(f"[{i}" in user_msg for i in ids)  # the panel shows the literal prompt
+
+
+@pytest.mark.parametrize("body", [b"", b"not json", json.dumps({"question": ""}).encode(),
+                                  json.dumps({"question": "x" * 501}).encode(), b"[1,2]"])
+def test_bad_requests_are_400(preview, body):
+    code, err = _post(preview + "/api/ask", body) if body else _post(preview + "/api/ask", b"")
+    assert code == 400 and "error" in err
+
+
+def test_live_mode_uses_chat_and_marks_sent():
+    seen = {}
+
+    def chat(tier, msgs):
+        seen["tier"] = tier
+        return "Your next report is due October 15 [demo-019, 2026-09-04].", "fake-nemotron"
+
+    httpd, base = _server(chat)
+    try:
+        code, t = _post(base + "/api/ask", json.dumps({"question": "When is the next county report due?"}).encode())
+        assert code == 200 and t["mode"] == "live" and t["egress"]["sent"] is True
+        assert t["answer"].startswith("Your next report") and t["model"] == "fake-nemotron" and seen["tier"] == "nano"
+        code, t = _post(base + "/api/ask", json.dumps({"question": "When is it?", "dry_run": True}).encode())
+        assert t["mode"] == "preview" and t["answer"] is None
+    finally:
+        httpd.shutdown()
+
+
+def test_model_failure_is_502_not_a_crash():
+    def chat(tier, msgs):
+        raise OSError("network down")
+
+    httpd, base = _server(chat)
+    try:
+        code, err = _post(base + "/api/ask", json.dumps({"question": "hi there"}).encode())
+        assert code == 502 and "network down" in err["error"]
+        assert _get(base + "/api/status")[0] == 200
+    finally:
+        httpd.shutdown()
+
+
+def test_hourly_cap_limits_live_calls_only():
+    from palace.web import HourlyCap
+    now = [1000.0]
+    cap = HourlyCap(2, clock=lambda: now[0])
+    assert cap.take() and cap.take() and not cap.take()
+    now[0] += 3600
+    assert cap.take()
+    assert all(HourlyCap(0).take() for _ in range(100))
+
+    calls = []
+    cfg = Config.from_env({})
+    httpd = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(
+        cfg, DemoMemory(), lambda tier, msgs: (calls.append(tier) or "ok [demo-019]", "m"), HourlyCap(1)))
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    base = f"http://127.0.0.1:{httpd.server_address[1]}"
+    try:
+        body = json.dumps({"question": "When is the next county report due?"}).encode()
+        assert _post(base + "/api/ask", body)[0] == 200
+        code, err = _post(base + "/api/ask", body)
+        assert code == 429 and err["limit"] is True and len(calls) == 1
+        code, t = _post(base + "/api/ask", json.dumps({"question": "When?", "dry_run": True}).encode())
+        assert code == 200 and t["mode"] == "preview"     # the page's fallback still works over the cap
+    finally:
+        httpd.shutdown()
