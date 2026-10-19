@@ -164,3 +164,16 @@ def test_cli_without_api_key_fails_cleanly(capsys, monkeypatch):
     monkeypatch.delenv("PALACE_URL", raising=False)
     assert cli_main(["ask", "hello"]) == 2
     assert "NEBIUS_API_KEY" in capsys.readouterr().err
+
+
+# --- answer normalisation (measured live 2026-10-19: Nemotron Super cites as 【demo-008】) -------
+def test_turn_normalises_lenticular_citations_and_whitespace():
+    def chat(tier, msgs):
+        return Completion("\n\nRun a SMART check first【demo-008】, then hand it out【demo-012, 2026-06-30】.\n", "m", None, None)
+    turn = run_turn("What is the rule for accepting donated laptops?", DemoMemory(), chat)
+    assert turn.answer == "Run a SMART check first[demo-008], then hand it out[demo-012, 2026-06-30]."
+
+
+def test_normalise_leaves_plain_text_and_square_citations_alone():
+    from palace.agent import normalise_answer
+    assert normalise_answer("Saturdays 10-2 [demo-001]. 【not a citation】") == "Saturdays 10-2 [demo-001]. 【not a citation】"

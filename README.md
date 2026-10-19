@@ -4,7 +4,7 @@
 
 Ask it what you decided, what you promised, or what happened last time, and it answers with dated citations from your own archive. Your memory stays on your server; only the few snippets needed for each answer go to the model, and a "what leaves the house" log shows exactly which ones.
 
-> Status: **skeleton** for the Nebius x NVIDIA Global AI Hackathon (Personal AI track). Recall, routing, the egress log, the CLI, the web chat and the tests work offline today. The live Token Factory call is wired but not yet run (needs an API key), and the Hermes Agent persona and public deploy are on the roadmap below.
+> Status: a working build for the Nebius x NVIDIA Global AI Hackathon (Personal AI track). Recall, routing, the egress log, the CLI, the web chat and the evals work, and live answers run on Nemotron 3 Nano/Super/Ultra via Token Factory (first live eval 2026-10-19; see Evals). The Hermes Agent persona and public deploy are on the roadmap below.
 
 ## How it works
 
@@ -24,7 +24,7 @@ question ──► recall (palace-daemon: vector + BM25 + graph)  ──► top 
 ## Run
 
 ```bash
-python3 -m pytest -q                                   # 53 tests, offline
+python3 -m pytest -q                                   # 56 tests, offline
 python3 -m palace ask "When is the next county report due?" --dry-run
 python3 -m palace eval                                 # offline: recall@k + router tier accuracy
 NEBIUS_API_KEY=... python3 -m palace models            # check the tier ids against the live catalog
@@ -39,7 +39,7 @@ python3 -m palace serve                                # web chat on http://127.
 |---|---|
 | `NEBIUS_API_KEY` | Token Factory API key |
 | `NEBIUS_BASE_URL` | OpenAI-compatible base URL (default `https://api.tokenfactory.nebius.com/v1/`, verified live) |
-| `PALACE_MODEL_NANO/SUPER/ULTRA` | Model ids per tier (defaults are candidates; `palace models` checks them against the live catalog) |
+| `PALACE_MODEL_NANO/SUPER/ULTRA` | Model ids per tier (defaults verified in the live catalog 2026-10-19; `palace models` re-checks) |
 | `PALACE_PRICE_NANO/SUPER/ULTRA` | `"input,output"` USD per 1M tokens, for the per-answer cost (defaults in `config.py`) |
 | `PALACE_URL`, `PALACE_API_KEY` | A **demo** palace-daemon; omit to use the offline synthetic palace |
 | `PALACE_FORBIDDEN_HOSTS` | Comma-separated hosts that serve a **real** palace (added to the files below); subdomains are covered too |
@@ -57,8 +57,20 @@ report to `evals/runs/`. Offline it scores **recall@k** (are the expected memori
 accuracy**; `--live` adds **citation validity** (does the answer cite only memories it was given?),
 **expected-citation hits**, **abstention** on unanswerable questions, and token, latency and cost totals.
 
+| Run (2026-10-19) | recall@k | tier acc. | citation valid | expected cited | abstain | tokens | cost | time |
+|---|---|---|---|---|---|---|---|---|
+| `baseline-offline` | 0.958 | 0.731 | | | | | | |
+| `live-2026-10-19` (before the fix) | 0.958 | 0.731 | 1.0* | 0.792 | 1.0 | 10,368 + 4,249 | $0.0097 | 40 s |
+| `live-2026-10-19-normalised` | 0.958 | 0.731 | 1.0 | 0.958 | 1.0 | 10,368 + 4,382 | $0.0102 | 41 s |
+
+\*Not real evidence. Nemotron 3 Super cited 4 answers as `【demo-008】`, so the scorer saw *no* citations
+on them, and "no invented ids" was vacuous. Answers are now normalised to `[demo-008]` and the scorer
+reads both forms. Re-scoring the saved answers gives 23/24, and still no invented ids. The remaining miss
+(q13) is recall: no stemming, so "hotspots/returned" doesn't match "Hotspot/returns". The tier misses are
+the keyword router's (see the "miss" lines from `palace eval`).
+
 ## Roadmap to submission (Oct 30, 2026)
-1. Confirm the Nemotron 3 Nano/Super/Ultra ids with `palace models`; make the first real call and a live eval run.
+1. ~~Confirm the Nemotron 3 Nano/Super/Ultra ids with `palace models`; make the first real call and a live eval run.~~ (done 2026-10-19)
 2. Hermes Agent persona: expose `recall`, `remember` and `brief_me` as Hermes tools that call this turn loop.
 3. Optional: re-embed the demo wing with an NVIDIA embedding model on Token Factory; compare latency and quality.
 4. ~~Web chat with the "what leaves the house" panel (dark/light)~~ (done: `palace serve`); public demo on the synthetic palace.

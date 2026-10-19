@@ -16,7 +16,7 @@ from .memory import MemoryBackend
 from .tokenfactory import Completion
 
 QUESTIONS = Path(__file__).resolve().parent.parent / "evals" / "questions.jsonl"
-_CITE = re.compile(r"\[(demo-\d+)")
+_CITE = re.compile(r"[\[【](demo-\d+)")
 
 
 def load_questions(path: Path = QUESTIONS) -> list[dict]:

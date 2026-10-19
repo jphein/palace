@@ -121,3 +121,8 @@ def test_cli_eval_offline_writes_report(tmp_path, monkeypatch, capsys):
     rep = json.loads(out.read_text())
     assert rep["summary"]["mode"] == "offline" and rep["rows"]
     assert "recall@k" in capsys.readouterr().out
+
+
+def test_cited_ids_also_reads_lenticular_brackets():
+    # the eval must still count a citation format it didn't normalise (so format drift isn't scored as "no citations")
+    assert cited_ids("Run a SMART check【demo-008】 and [demo-012].") == ["demo-008", "demo-012"]

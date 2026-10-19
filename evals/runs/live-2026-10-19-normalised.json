@@ -1,0 +1,873 @@
+{
+  "summary": {
+    "mode": "live",
+    "questions": 26,
+    "k": 8,
+    "recall_at_k": 0.958,
+    "tier_accuracy": 0.731,
+    "tiers": {
+      "nano": 8,
+      "super": 12,
+      "ultra": 6
+    },
+    "citation_valid": 1.0,
+    "expected_cited": 0.958,
+    "abstain_accuracy": 1.0,
+    "prompt_tokens": 10368,
+    "completion_tokens": 4382,
+    "cost_usd": 0.010162,
+    "latency_s": 40.65,
+    "models": [
+      "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+      "nvidia/Nemotron-3-Ultra-550b-a55b",
+      "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "at": "2026-10-19T14:16:01+00:00"
+  },
+  "rows": [
+    {
+      "id": "q01",
+      "question": "When is the next county report due?",
+      "tier": "nano",
+      "expect_tier": "nano",
+      "tier_ok": true,
+      "reason": "a short factual lookup",
+      "recalled_ids": [
+        "demo-019",
+        "demo-007",
+        "demo-014",
+        "demo-012",
+        "demo-013",
+        "demo-023",
+        "demo-004",
+        "demo-003"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "The next county report is due on **October\u202f15**.\u202f[demo-019]\u202fand the quarterly schedule in\u202f[demo-007]\u202fboth confirm this date.",
+      "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+      "usage": {
+        "prompt_tokens": 542,
+        "completion_tokens": 205,
+        "latency_s": 1.244
+      },
+      "cost_usd": 8.172e-05,
+      "cited_ids": [
+        "demo-019",
+        "demo-007"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q02",
+      "question": "When is the scam spotting class?",
+      "tier": "nano",
+      "expect_tier": "nano",
+      "tier_ok": true,
+      "reason": "a short factual lookup",
+      "recalled_ids": [
+        "demo-024",
+        "demo-012",
+        "demo-014",
+        "demo-022",
+        "demo-019",
+        "demo-002",
+        "demo-005"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "The scam\u2011spotting class is scheduled for **November\u202f7 at 10\u202fa.m.**\u202f[demo-024]",
+      "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+      "usage": {
+        "prompt_tokens": 482,
+        "completion_tokens": 123,
+        "latency_s": 1.216
+      },
+      "cost_usd": 5.844e-05,
+      "cited_ids": [
+        "demo-024"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q03",
+      "question": "What did I decide about the coordinator, and did it change?",
+      "tier": "ultra",
+      "expect_tier": "ultra",
+      "tier_ok": true,
+      "reason": "asks for planning, comparison or a judgement call",
+      "recalled_ids": [
+        "demo-013",
+        "demo-016"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "You initially decided to hire a part-time coordinator for the fall, funded from general donations [demo-013]. That decision was reversed about a month later\u2014donations came in 40% under plan, so no coordinator hire this fall; you\u2019ll revisit in January [demo-016].",
+      "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+      "usage": {
+        "prompt_tokens": 211,
+        "completion_tokens": 199,
+        "latency_s": 1.28
+      },
+      "cost_usd": 0.000808,
+      "cited_ids": [
+        "demo-013",
+        "demo-016"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q04",
+      "question": "Should I still plan on hiring a coordinator this fall?",
+      "tier": "ultra",
+      "expect_tier": "ultra",
+      "tier_ok": true,
+      "reason": "asks for planning, comparison or a judgement call",
+      "recalled_ids": [
+        "demo-016",
+        "demo-013",
+        "demo-002"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "No \u2014 the July decision to hire a part-time coordinator this fall was reversed on August 5 because donations came in 40% under plan. The team will revisit the idea in January [demo-016].",
+      "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+      "usage": {
+        "prompt_tokens": 264,
+        "completion_tokens": 295,
+        "latency_s": 1.753
+      },
+      "cost_usd": 0.001149,
+      "cited_ids": [
+        "demo-016"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q05",
+      "question": "Who is covering the repair nights in October?",
+      "tier": "nano",
+      "expect_tier": "nano",
+      "tier_ok": true,
+      "reason": "a short factual lookup",
+      "recalled_ids": [
+        "demo-020",
+        "demo-002",
+        "demo-007",
+        "demo-019"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "Dee has offered to cover the first two repair nights in October\u202f[demo-020].",
+      "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+      "usage": {
+        "prompt_tokens": 307,
+        "completion_tokens": 118,
+        "latency_s": 1.087
+      },
+      "cost_usd": 4.674e-05,
+      "cited_ids": [
+        "demo-020"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q06",
+      "question": "Which grant did we apply for, and why not the state one?",
+      "tier": "nano",
+      "expect_tier": "super",
+      "tier_ok": false,
+      "reason": "a short factual lookup",
+      "recalled_ids": [
+        "demo-003",
+        "demo-006",
+        "demo-012",
+        "demo-013",
+        "demo-014",
+        "demo-018",
+        "demo-023",
+        "demo-002"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "We applied for the **county Digital Inclusion mini\u2011grant** (the $8,000 one).\u202fWe skipped the state grant because the state application requires audited financials that we don\u2019t have yet.\u202f[demo-003]",
+      "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+      "usage": {
+        "prompt_tokens": 548,
+        "completion_tokens": 181,
+        "latency_s": 1.52
+      },
+      "cost_usd": 7.632e-05,
+      "cited_ids": [
+        "demo-003"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q07",
+      "question": "Can the county grant money pay for staff wages?",
+      "tier": "super",
+      "expect_tier": "super",
+      "tier_ok": true,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-012",
+        "demo-013",
+        "demo-021",
+        "demo-023",
+        "demo-004",
+        "demo-003",
+        "demo-007",
+        "demo-014"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "No\u2014the county grant explicitly states that its funds may be used only for devices, hotspots, and class materials, and \u201cno staff wages from this money.\u201d\u202f[demo-012]",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "usage": {
+        "prompt_tokens": 536,
+        "completion_tokens": 119,
+        "latency_s": 1.24
+      },
+      "cost_usd": 0.0002679,
+      "cited_ids": [
+        "demo-012"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q08",
+      "question": "What is the rule for accepting donated laptops?",
+      "tier": "super",
+      "expect_tier": "super",
+      "tier_ok": true,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-008",
+        "demo-021"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "Run a SMART check on any donated laptop before accepting it\u202f\u2014\u202fthis is the current rule for donations of machines[demo-008].",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "usage": {
+        "prompt_tokens": 192,
+        "completion_tokens": 78,
+        "latency_s": 1.2
+      },
+      "cost_usd": 0.0001278,
+      "cited_ids": [
+        "demo-008"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q09",
+      "question": "How should I format printed guides for the seniors class?",
+      "tier": "ultra",
+      "expect_tier": "super",
+      "tier_ok": false,
+      "reason": "asks for planning, comparison or a judgement call",
+      "recalled_ids": [
+        "demo-006",
+        "demo-022",
+        "demo-002",
+        "demo-005",
+        "demo-024",
+        "demo-012",
+        "demo-014",
+        "demo-019"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "Use **one-page printed guides** (not slides) with a **minimum 18 pt font** \u2014 seniors learn faster that way [demo-006].",
+      "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+      "usage": {
+        "prompt_tokens": 532,
+        "completion_tokens": 154,
+        "latency_s": 1.318
+      },
+      "cost_usd": 0.000994,
+      "cited_ids": [
+        "demo-006"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q10",
+      "question": "Why did the grant portal reject our budget PDF?",
+      "tier": "ultra",
+      "expect_tier": "nano",
+      "tier_ok": false,
+      "reason": "asks for planning, comparison or a judgement call",
+      "recalled_ids": [
+        "demo-004",
+        "demo-023",
+        "demo-012",
+        "demo-013",
+        "demo-003"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "The county mini-grant portal rejected the PDF because the file was over the 5\u202fMB size limit. You resolved it by re\u2011exporting the budget at 150\u202fdpi and resubmitted on March\u202f29 [demo-004].",
+      "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+      "usage": {
+        "prompt_tokens": 387,
+        "completion_tokens": 208,
+        "latency_s": 1.277
+      },
+      "cost_usd": 0.001011,
+      "cited_ids": [
+        "demo-004"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q11",
+      "question": "When is Mom's birthday dinner, and where?",
+      "tier": "nano",
+      "expect_tier": "nano",
+      "tier_ok": true,
+      "reason": "a short factual lookup",
+      "recalled_ids": [
+        "demo-017"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "Mom\u2019s birthday dinner is scheduled for **Sunday, September\u202f20** at a **Thai restaurant** (for six people)\u202f\u2014\u202fas noted in your plan.\u202f[demo-017]",
+      "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+      "usage": {
+        "prompt_tokens": 154,
+        "completion_tokens": 259,
+        "latency_s": 1.656
+      },
+      "cost_usd": 7.14e-05,
+      "cited_ids": [
+        "demo-017"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q12",
+      "question": "Am I cleared to lift the donated monitors yet?",
+      "tier": "super",
+      "expect_tier": "nano",
+      "tier_ok": false,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-021",
+        "demo-008",
+        "demo-003",
+        "demo-009"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "Yes\u2014you were cleared by your physical therapist for normal lifting and can now move the donated monitors again[demo-021].",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "usage": {
+        "prompt_tokens": 306,
+        "completion_tokens": 105,
+        "latency_s": 1.182
+      },
+      "cost_usd": 0.0001863,
+      "cited_ids": [
+        "demo-021"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q13",
+      "question": "How do we get borrowed hotspots returned on time?",
+      "tier": "super",
+      "expect_tier": "super",
+      "tier_ok": true,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-012",
+        "demo-013"
+      ],
+      "recalled": false,
+      "should_abstain": false,
+      "answer": "I\u2019m sorry\u2014I don\u2019t have any information in the provided memories about how to ensure borrowed hotspots are returned on time. You might want to ask about existing policies or procedures for device checkout and return, or whether there\u2019s a reminder system in place. Let me know if you\u2019d like to explore those topics!",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "usage": {
+        "prompt_tokens": 211,
+        "completion_tokens": 114,
+        "latency_s": 1.157
+      },
+      "cost_usd": 0.0001659,
+      "cited_ids": [],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": false,
+      "abstained": null
+    },
+    {
+      "id": "q14",
+      "question": "What hours is the tech hub open on weekends?",
+      "tier": "super",
+      "expect_tier": "nano",
+      "tier_ok": false,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-001",
+        "demo-020",
+        "demo-010",
+        "demo-006",
+        "demo-024",
+        "demo-013",
+        "demo-016",
+        "demo-009"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "The tech hub is open on **Saturdays from\u202f10\u202fAM to\u202f2\u202fPM**[demo-001]. The memories don\u2019t specify any hours for Sundays, so I don\u2019t have information about weekend opening on that day. If you\u2019d like, you could ask specifically about Sunday hours or any other weekend schedule details.",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "usage": {
+        "prompt_tokens": 517,
+        "completion_tokens": 301,
+        "latency_s": 4.008
+      },
+      "cost_usd": 0.000426,
+      "cited_ids": [
+        "demo-001"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q15",
+      "question": "What do I need to gather for the October county report?",
+      "tier": "super",
+      "expect_tier": "super",
+      "tier_ok": true,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-019",
+        "demo-007",
+        "demo-014",
+        "demo-020",
+        "demo-012",
+        "demo-013",
+        "demo-023",
+        "demo-004"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "For the October\u202f15 county report you\u2019ll need to collect:\n\n- Device counts  \n- Class attendance data since July  \n- Two participant quotes  \n\n(See the note about the upcoming report.) [demo-019]",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "usage": {
+        "prompt_tokens": 525,
+        "completion_tokens": 123,
+        "latency_s": 1.671
+      },
+      "cost_usd": 0.0002682,
+      "cited_ids": [
+        "demo-019"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q16",
+      "question": "Where do the county reports get submitted?",
+      "tier": "nano",
+      "expect_tier": "nano",
+      "tier_ok": true,
+      "reason": "a short factual lookup",
+      "recalled_ids": [
+        "demo-023",
+        "demo-004",
+        "demo-012",
+        "demo-013",
+        "demo-007",
+        "demo-014",
+        "demo-019",
+        "demo-003"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "The county reports are submitted through the **same portal used for the grant application**\u2014the Digital Inclusion portal\u2014making sure the file stays within the 5\u202fMB limit.\u202f[demo-023]",
+      "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+      "usage": {
+        "prompt_tokens": 542,
+        "completion_tokens": 157,
+        "latency_s": 1.293
+      },
+      "cost_usd": 7.02e-05,
+      "cited_ids": [
+        "demo-023"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q17",
+      "question": "Who teaches the seniors class?",
+      "tier": "nano",
+      "expect_tier": "nano",
+      "tier_ok": true,
+      "reason": "a short factual lookup",
+      "recalled_ids": [
+        "demo-022",
+        "demo-002",
+        "demo-005",
+        "demo-006",
+        "demo-024",
+        "demo-012",
+        "demo-014",
+        "demo-019"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "Marcus teaches the seniors class.\u202f[demo-005]",
+      "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+      "usage": {
+        "prompt_tokens": 527,
+        "completion_tokens": 168,
+        "latency_s": 1.338
+      },
+      "cost_usd": 7.194e-05,
+      "cited_ids": [
+        "demo-005"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q18",
+      "question": "The Saturday web form double-booked slots. What was the workaround?",
+      "tier": "super",
+      "expect_tier": "super",
+      "tier_ok": true,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-015",
+        "demo-010",
+        "demo-011",
+        "demo-001"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "Cap each time slot at\u202f4 participants and send a confirmation text after booking[demo-015].",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "usage": {
+        "prompt_tokens": 323,
+        "completion_tokens": 86,
+        "latency_s": 1.848
+      },
+      "cost_usd": 0.0001743,
+      "cited_ids": [
+        "demo-015"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q19",
+      "question": "How many attendees and devices were in the first quarterly report?",
+      "tier": "super",
+      "expect_tier": "super",
+      "tier_ok": true,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-014",
+        "demo-007",
+        "demo-012",
+        "demo-020",
+        "demo-019"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "The first quarterly report listed **41 attendees** and **12 devices** distributed\u202f\u2014\u202fas noted when it was filed early[demo-014].",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "usage": {
+        "prompt_tokens": 364,
+        "completion_tokens": 125,
+        "latency_s": 1.787
+      },
+      "cost_usd": 0.0002217,
+      "cited_ids": [
+        "demo-014"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q20",
+      "question": "Help me plan October at the hub: what do I owe the county, and who is covering repair nights?",
+      "tier": "ultra",
+      "expect_tier": "ultra",
+      "tier_ok": true,
+      "reason": "asks for planning, comparison or a judgement call",
+      "recalled_ids": [
+        "demo-020",
+        "demo-002",
+        "demo-007",
+        "demo-019",
+        "demo-016",
+        "demo-013",
+        "demo-012",
+        "demo-014"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "**What you owe the county**  \n- A quarterly report due **October 15** that includes: device counts, class attendance since July, and two participant quotes [demo-019].\n\n**Repair-night coverage for October**  \n- **Dee** has offered to cover the **first two repair nights** [demo-020].  \n- **Priya is unavailable on Tuesdays in October** [demo-020], so any Tuesday repair nights after the first two still need a volunteer.  \n- The spring plan called for two repair nights per month [demo-002], but only the first two October nights are currently assigned.\n\n**Next steps you might want**  \n- Confirm whether Dee can cover more than the first two nights, or recruit another volunteer for the remaining Tuesday(s).  \n- Start gathering the device counts, attendance numbers, and participant quotes for the October 15 county report.",
+      "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+      "usage": {
+        "prompt_tokens": 531,
+        "completion_tokens": 516,
+        "latency_s": 2.881
+      },
+      "cost_usd": 0.002079,
+      "cited_ids": [
+        "demo-019",
+        "demo-020",
+        "demo-002"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q21",
+      "question": "Compare Friday evening and Saturday turnout at the hub.",
+      "tier": "ultra",
+      "expect_tier": "ultra",
+      "tier_ok": true,
+      "reason": "asks for planning, comparison or a judgement call",
+      "recalled_ids": [
+        "demo-001",
+        "demo-015",
+        "demo-011",
+        "demo-020",
+        "demo-010",
+        "demo-006",
+        "demo-024",
+        "demo-013"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "Friday evenings averaged **3 people**, while Saturday pilot sessions drew **14 people** \u2014 leading to the decision to keep the hub open Saturdays 10\u20112 instead of Friday evenings [demo-001].",
+      "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+      "usage": {
+        "prompt_tokens": 517,
+        "completion_tokens": 159,
+        "latency_s": 1.412
+      },
+      "cost_usd": 0.000994,
+      "cited_ids": [
+        "demo-001"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q22",
+      "question": "What did we plant in the garden bed?",
+      "tier": "super",
+      "expect_tier": "super",
+      "tier_ok": true,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-011"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "We planted tomatoes and basil in the hub\u2019s side bed\u202f\u2014\u202fMarcus even built the trellis for them. [demo-011]",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "usage": {
+        "prompt_tokens": 152,
+        "completion_tokens": 71,
+        "latency_s": 1.332
+      },
+      "cost_usd": 0.0001095,
+      "cited_ids": [
+        "demo-011"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q23",
+      "question": "How much was the county grant award?",
+      "tier": "super",
+      "expect_tier": "super",
+      "tier_ok": true,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-012",
+        "demo-013",
+        "demo-023",
+        "demo-004",
+        "demo-003",
+        "demo-007",
+        "demo-014",
+        "demo-019"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "The county grant award was **$8,000**\u202f\u2014\u202fas noted in the record of the grant being awarded [demo-012]. Let me know if you\u2019d like any other details about how those funds can be used or reporting requirements!",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "usage": {
+        "prompt_tokens": 542,
+        "completion_tokens": 108,
+        "latency_s": 1.601
+      },
+      "cost_usd": 0.0002598,
+      "cited_ids": [
+        "demo-012"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q24",
+      "question": "Did I file the July county report on time?",
+      "tier": "nano",
+      "expect_tier": "nano",
+      "tier_ok": true,
+      "reason": "a short factual lookup",
+      "recalled_ids": [
+        "demo-007",
+        "demo-019",
+        "demo-013",
+        "demo-004",
+        "demo-014",
+        "demo-016",
+        "demo-012",
+        "demo-023"
+      ],
+      "recalled": true,
+      "should_abstain": false,
+      "answer": "Yes\u2014you submitted the July quarterly report **one day early** (on July\u202f14), which satisfies the July\u202f15 deadline the county set.\u202f[demo-014]\u202f[demo-007]",
+      "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+      "usage": {
+        "prompt_tokens": 531,
+        "completion_tokens": 221,
+        "latency_s": 1.355
+      },
+      "cost_usd": 8.49e-05,
+      "cited_ids": [
+        "demo-014",
+        "demo-007"
+      ],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": true,
+      "abstained": null
+    },
+    {
+      "id": "q25",
+      "question": "What is my dentist's phone number?",
+      "tier": "super",
+      "expect_tier": "nano",
+      "tier_ok": false,
+      "reason": "default",
+      "recalled_ids": [],
+      "recalled": null,
+      "should_abstain": true,
+      "answer": "I\u2019m sorry\u2014I don\u2019t have any information about your dentist\u2019s phone number in my records. If you\u2019d like, you could share more details (e.g., the name of the dental office or when you last visited) and I can try to help locate it for you. Let me know how you\u2019d like to proceed!",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "usage": {
+        "prompt_tokens": 108,
+        "completion_tokens": 90,
+        "latency_s": 1.415
+      },
+      "cost_usd": 0.0001134,
+      "cited_ids": [],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": null,
+      "abstained": true
+    },
+    {
+      "id": "q26",
+      "question": "What is the Wi-Fi password at the hub?",
+      "tier": "super",
+      "expect_tier": "nano",
+      "tier_ok": false,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-001",
+        "demo-020",
+        "demo-010",
+        "demo-006",
+        "demo-024",
+        "demo-013",
+        "demo-016",
+        "demo-009"
+      ],
+      "recalled": null,
+      "should_abstain": true,
+      "answer": "I\u2019m sorry\u2014I don\u2019t have any information about the Wi\u2011Fi password in the memories you\u2019ve shared. If you\u2019d like details about the hub\u2019s schedule, decisions, or other topics covered in those notes, just let me know!",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "usage": {
+        "prompt_tokens": 517,
+        "completion_tokens": 99,
+        "latency_s": 1.579
+      },
+      "cost_usd": 0.0002442,
+      "cited_ids": [],
+      "invented_ids": [],
+      "citation_valid": true,
+      "expected_cited": null,
+      "abstained": true
+    }
+  ]
+}

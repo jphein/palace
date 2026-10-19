@@ -88,8 +88,8 @@ def lan_reason(host: str, resolve=None) -> str | None:
 
 
 # Base URL verified 2026-10-19 (GET /v1/models answers 401 "token is not present" without a key).
-# Model ids and prices are CANDIDATES from third-party listings of the Nebius catalog (2026-10-19);
-# `palace models` checks them against the live catalog once NEBIUS_API_KEY exists.
+# Model ids verified in the live catalog 2026-10-19 (`palace models`: all three ok). Prices are from
+# third-party listings of the Nebius catalog; confirm in the Token Factory console.
 DEFAULT_BASE_URL = "https://api.tokenfactory.nebius.com/v1/"
 DEFAULT_MODELS = {
     "nano": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",  # fast, everyday calls

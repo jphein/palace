@@ -5,6 +5,7 @@ model for this answer. The memory store itself never leaves the user's server.
 Hermes Agent integration (tools + persona) wraps this same turn; see README "Roadmap"."""
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Callable
 
@@ -18,6 +19,13 @@ Answer ONLY from the numbered memories provided. Cite every claim with the memor
 If the memories don't contain the answer, say so plainly and suggest what to ask instead. Be brief and warm."""
 
 MAX_SNIPPET = 600
+# Some Nemotron tiers cite with CJK lenticular brackets (【demo-008】, measured live 2026-10-19); the UI and
+# the evals expect [demo-008]. Only memory-id-shaped contents are rewritten.
+_LENTICULAR = re.compile(r"【(demo-\d+(?:,\s*[0-9-]{10})?)】")
+
+
+def normalise_answer(text: str) -> str:
+    return _LENTICULAR.sub(r"[\1]", text).strip()
 
 
 @dataclass
@@ -58,7 +66,7 @@ def run_turn(question: str, memory: MemoryBackend, chat: Callable[[str, list[dic
                 egress=[{"id": m.id, "chars": min(len(m.text), MAX_SNIPPET)} for m in mems])
     if chat is not None:
         c = chat(r.tier, prompt)
-        turn.answer, turn.model = c.text, c.model
+        turn.answer, turn.model = normalise_answer(c.text), c.model
         turn.usage = {"prompt_tokens": c.prompt_tokens, "completion_tokens": c.completion_tokens, "latency_s": c.latency_s}
         turn.cost_usd = cost(r.tier, c.prompt_tokens, c.completion_tokens, prices)
     return turn
