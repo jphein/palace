@@ -24,9 +24,12 @@ question ──► recall (palace-daemon: vector + BM25 + graph)  ──► top 
 ## Run
 
 ```bash
-python3 -m pytest -q                                   # 43 tests, offline
+python3 -m pytest -q                                   # 53 tests, offline
 python3 -m palace ask "When is the next county report due?" --dry-run
+python3 -m palace eval                                 # offline: recall@k + router tier accuracy
+NEBIUS_API_KEY=... python3 -m palace models            # check the tier ids against the live catalog
 NEBIUS_API_KEY=... python3 -m palace ask "Should I still plan on hiring a coordinator?"
+NEBIUS_API_KEY=... python3 -m palace eval --live       # also: citation validity, abstention, tokens, cost
 python3 -m palace serve                                # web chat on http://127.0.0.1:8765/
 ```
 
@@ -35,8 +38,9 @@ python3 -m palace serve                                # web chat on http://127.
 | Env | Meaning |
 |---|---|
 | `NEBIUS_API_KEY` | Token Factory API key |
-| `NEBIUS_BASE_URL` | OpenAI-compatible base URL (default in `config.py`, **to verify**) |
-| `PALACE_MODEL_NANO/SUPER/ULTRA` | Model ids per tier (defaults are placeholders, **to verify** in the Token Factory catalog) |
+| `NEBIUS_BASE_URL` | OpenAI-compatible base URL (default `https://api.tokenfactory.nebius.com/v1/`, verified live) |
+| `PALACE_MODEL_NANO/SUPER/ULTRA` | Model ids per tier (defaults are candidates; `palace models` checks them against the live catalog) |
+| `PALACE_PRICE_NANO/SUPER/ULTRA` | `"input,output"` USD per 1M tokens, for the per-answer cost (defaults in `config.py`) |
 | `PALACE_URL`, `PALACE_API_KEY` | A **demo** palace-daemon; omit to use the offline synthetic palace |
 | `PALACE_FORBIDDEN_HOSTS` | Comma-separated hosts that serve a **real** palace (added to the files below); subdomains are covered too |
 | `PALACE_FORBIDDEN_HOSTS_FILE` | One more deny-list file (default files: `~/.config/palace/forbidden-hosts`, `./.forbidden-hosts`) |
@@ -45,8 +49,16 @@ python3 -m palace serve                                # web chat on http://127.
 
 **Container.** `docker build -t palace-nemotron .` then `docker run --rm -p 8080:8080 -e NEBIUS_API_KEY -e PALACE_MAX_ASKS_PER_HOUR=120 palace-nemotron`. The image serves the web chat on the synthetic demo palace, as a non-root user.
 
+## Evals
+
+`evals/questions.jsonl` holds 26 questions over the synthetic palace, each with the memories a good answer must
+cite and the tier it deserves; two have no answer in the palace and should be declined. `palace eval` writes a
+report to `evals/runs/`. Offline it scores **recall@k** (are the expected memories in the prompt?) and **tier
+accuracy**; `--live` adds **citation validity** (does the answer cite only memories it was given?),
+**expected-citation hits**, **abstention** on unanswerable questions, and token, latency and cost totals.
+
 ## Roadmap to submission (Oct 30, 2026)
-1. Verify the Token Factory base URL and Nemotron 3 Nano/Super/Ultra ids; make the first real call.
+1. Confirm the Nemotron 3 Nano/Super/Ultra ids with `palace models`; make the first real call and a live eval run.
 2. Hermes Agent persona: expose `recall`, `remember` and `brief_me` as Hermes tools that call this turn loop.
 3. Optional: re-embed the demo wing with an NVIDIA embedding model on Token Factory; compare latency and quality.
 4. ~~Web chat with the "what leaves the house" panel (dark/light)~~ (done: `palace serve`); public demo on the synthetic palace.

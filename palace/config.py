@@ -87,18 +87,31 @@ def lan_reason(host: str, resolve=None) -> str | None:
     return None
 
 
-# TODO(verify in the Token Factory console): exact base URL and model ids. The API is
-# OpenAI-compatible; these defaults are placeholders to be confirmed before the first real call.
+# Base URL verified 2026-10-19 (GET /v1/models answers 401 "token is not present" without a key).
+# Model ids and prices are CANDIDATES from third-party listings of the Nebius catalog (2026-10-19);
+# `palace models` checks them against the live catalog once NEBIUS_API_KEY exists.
 DEFAULT_BASE_URL = "https://api.tokenfactory.nebius.com/v1/"
 DEFAULT_MODELS = {
-    "nano": "nvidia/nemotron-3-nano",    # fast, everyday calls
-    "super": "nvidia/nemotron-3-super",  # default
-    "ultra": "nvidia/nemotron-3-ultra",  # serious reasoning, used sparingly
+    "nano": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",  # fast, everyday calls
+    "super": "nvidia/nemotron-3-super-120b-a12b",     # default
+    "ultra": "nvidia/Nemotron-3-Ultra-550b-a55b",     # serious reasoning, used sparingly
 }
+# USD per 1M tokens (input, output), per tier. Override with PALACE_PRICE_<TIER>="in,out".
+DEFAULT_PRICES = {"nano": (0.06, 0.24), "super": (0.30, 0.90), "ultra": (1.00, 3.00)}
 
 
 class ConfigError(RuntimeError):
     pass
+
+
+def _price(raw: str | None, default: tuple[float, float]) -> tuple[float, float]:
+    if not raw:
+        return default
+    try:
+        p_in, p_out = (float(x) for x in raw.split(","))
+    except ValueError:
+        raise ConfigError(f"price {raw!r} must be 'input,output' in USD per 1M tokens") from None
+    return p_in, p_out
 
 
 @dataclass(frozen=True)
@@ -110,6 +123,7 @@ class Config:
     palace_api_key: str | None
     forbidden_hosts: frozenset[str] = field(default_factory=frozenset)
     allowed_hosts: frozenset[str] = field(default_factory=frozenset)
+    prices: dict[str, tuple[float, float]] = field(default_factory=lambda: dict(DEFAULT_PRICES))
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] | None = None, host_files: Iterable[Path] | None = None) -> "Config":
@@ -122,6 +136,7 @@ class Config:
             palace_api_key=e.get("PALACE_API_KEY") or None,
             forbidden_hosts=forbidden_hosts_from(e, host_files),
             allowed_hosts=frozenset(_split(e.get("PALACE_ALLOW_HOSTS", ""))),
+            prices={tier: _price(e.get(f"PALACE_PRICE_{tier.upper()}"), default) for tier, default in DEFAULT_PRICES.items()},
         )
         cfg.check_palace_url()
         return cfg

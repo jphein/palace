@@ -8,6 +8,7 @@ import pytest
 
 from palace.config import Config
 from palace.memory import DemoMemory
+from palace.tokenfactory import Completion
 from palace.web import make_handler
 
 
@@ -71,13 +72,14 @@ def test_live_mode_uses_chat_and_marks_sent():
 
     def chat(tier, msgs):
         seen["tier"] = tier
-        return "Your next report is due October 15 [demo-019, 2026-09-04].", "fake-nemotron"
+        return Completion("Your next report is due October 15 [demo-019, 2026-09-04].", "fake-nemotron", 120, 30, 0.4)
 
     httpd, base = _server(chat)
     try:
         code, t = _post(base + "/api/ask", json.dumps({"question": "When is the next county report due?"}).encode())
         assert code == 200 and t["mode"] == "live" and t["egress"]["sent"] is True
         assert t["answer"].startswith("Your next report") and t["model"] == "fake-nemotron" and seen["tier"] == "nano"
+        assert t["usage"]["prompt_tokens"] == 120 and t["cost_usd"] == pytest.approx((120 * 0.06 + 30 * 0.24) / 1e6)
         code, t = _post(base + "/api/ask", json.dumps({"question": "When is it?", "dry_run": True}).encode())
         assert t["mode"] == "preview" and t["answer"] is None
     finally:
@@ -109,7 +111,7 @@ def test_hourly_cap_limits_live_calls_only():
     calls = []
     cfg = Config.from_env({})
     httpd = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(
-        cfg, DemoMemory(), lambda tier, msgs: (calls.append(tier) or "ok [demo-019]", "m"), HourlyCap(1)))
+        cfg, DemoMemory(), lambda tier, msgs: Completion(calls.append(tier) or "ok [demo-019]", "m", None, None), HourlyCap(1)))
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     base = f"http://127.0.0.1:{httpd.server_address[1]}"
     try:

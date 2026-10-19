@@ -1,0 +1,26 @@
+{"id": "q01", "question": "When is the next county report due?", "expect_ids": ["demo-019"], "expect_tier": "nano"}
+{"id": "q02", "question": "When is the scam spotting class?", "expect_ids": ["demo-024"], "expect_tier": "nano"}
+{"id": "q03", "question": "What did I decide about the coordinator, and did it change?", "expect_ids": ["demo-013", "demo-016"], "expect_tier": "ultra"}
+{"id": "q04", "question": "Should I still plan on hiring a coordinator this fall?", "expect_ids": ["demo-016"], "expect_tier": "ultra"}
+{"id": "q05", "question": "Who is covering the repair nights in October?", "expect_ids": ["demo-020"], "expect_tier": "nano"}
+{"id": "q06", "question": "Which grant did we apply for, and why not the state one?", "expect_ids": ["demo-003"], "expect_tier": "super"}
+{"id": "q07", "question": "Can the county grant money pay for staff wages?", "expect_ids": ["demo-012"], "expect_tier": "super"}
+{"id": "q08", "question": "What is the rule for accepting donated laptops?", "expect_ids": ["demo-008"], "expect_tier": "super"}
+{"id": "q09", "question": "How should I format printed guides for the seniors class?", "expect_ids": ["demo-006"], "expect_tier": "super"}
+{"id": "q10", "question": "Why did the grant portal reject our budget PDF?", "expect_ids": ["demo-004"], "expect_tier": "nano"}
+{"id": "q11", "question": "When is Mom's birthday dinner, and where?", "expect_ids": ["demo-017"], "expect_tier": "nano"}
+{"id": "q12", "question": "Am I cleared to lift the donated monitors yet?", "expect_ids": ["demo-021"], "expect_tier": "nano"}
+{"id": "q13", "question": "How do we get borrowed hotspots returned on time?", "expect_ids": ["demo-018"], "expect_tier": "super"}
+{"id": "q14", "question": "What hours is the tech hub open on weekends?", "expect_ids": ["demo-001"], "expect_tier": "nano"}
+{"id": "q15", "question": "What do I need to gather for the October county report?", "expect_ids": ["demo-019"], "expect_tier": "super"}
+{"id": "q16", "question": "Where do the county reports get submitted?", "expect_ids": ["demo-023"], "expect_tier": "nano"}
+{"id": "q17", "question": "Who teaches the seniors class?", "expect_ids": ["demo-005"], "expect_tier": "nano"}
+{"id": "q18", "question": "The Saturday web form double-booked slots. What was the workaround?", "expect_ids": ["demo-015"], "expect_tier": "super"}
+{"id": "q19", "question": "How many attendees and devices were in the first quarterly report?", "expect_ids": ["demo-014"], "expect_tier": "super"}
+{"id": "q20", "question": "Help me plan October at the hub: what do I owe the county, and who is covering repair nights?", "expect_ids": ["demo-019", "demo-020"], "expect_tier": "ultra"}
+{"id": "q21", "question": "Compare Friday evening and Saturday turnout at the hub.", "expect_ids": ["demo-001"], "expect_tier": "ultra"}
+{"id": "q22", "question": "What did we plant in the garden bed?", "expect_ids": ["demo-011"], "expect_tier": "super"}
+{"id": "q23", "question": "How much was the county grant award?", "expect_ids": ["demo-012"], "expect_tier": "super"}
+{"id": "q24", "question": "Did I file the July county report on time?", "expect_ids": ["demo-014"], "expect_tier": "nano"}
+{"id": "q25", "question": "What is my dentist's phone number?", "expect_ids": [], "expect_tier": "nano"}
+{"id": "q26", "question": "What is the Wi-Fi password at the hub?", "expect_ids": [], "expect_tier": "nano"}

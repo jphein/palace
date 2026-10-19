@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import time
 import urllib.request
 from dataclasses import dataclass
 
@@ -14,6 +15,7 @@ class Completion:
     model: str
     prompt_tokens: int | None
     completion_tokens: int | None
+    latency_s: float | None = None
 
 
 class TokenFactory:
@@ -22,13 +24,22 @@ class TokenFactory:
             raise ConfigError("NEBIUS_API_KEY is not set (create it in the Token Factory console; store it in the vault).")
         self.cfg, self.timeout = cfg, timeout
 
-    def chat(self, tier: str, messages: list[dict], max_tokens: int = 700, temperature: float = 0.3) -> Completion:
-        model = self.cfg.models[tier]
-        body = {"model": model, "messages": messages, "max_tokens": max_tokens, "temperature": temperature}
-        req = urllib.request.Request(self.cfg.base_url.rstrip("/") + "/chat/completions", data=json.dumps(body).encode(),
+    def _req(self, path: str, body: dict | None = None) -> dict:
+        req = urllib.request.Request(self.cfg.base_url.rstrip("/") + path,
+                                     data=None if body is None else json.dumps(body).encode(),
                                      headers={"content-type": "application/json", "authorization": f"Bearer {self.cfg.api_key}"})
         with urllib.request.urlopen(req, timeout=self.timeout) as r:
-            data = json.loads(r.read())
+            return json.loads(r.read())
+
+    def chat(self, tier: str, messages: list[dict], max_tokens: int = 700, temperature: float = 0.3) -> Completion:
+        model = self.cfg.models[tier]
+        t0 = time.monotonic()
+        data = self._req("/chat/completions", {"model": model, "messages": messages, "max_tokens": max_tokens,
+                                               "temperature": temperature})
         usage = data.get("usage") or {}
         return Completion(data["choices"][0]["message"]["content"], data.get("model", model),
-                          usage.get("prompt_tokens"), usage.get("completion_tokens"))
+                          usage.get("prompt_tokens"), usage.get("completion_tokens"), round(time.monotonic() - t0, 3))
+
+    def list_models(self) -> list[str]:
+        """Model ids in the live catalog (GET /models)."""
+        return [m["id"] for m in self._req("/models").get("data", [])]

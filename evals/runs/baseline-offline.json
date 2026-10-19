@@ -1,0 +1,472 @@
+{
+  "summary": {
+    "mode": "offline",
+    "questions": 26,
+    "k": 8,
+    "recall_at_k": 0.958,
+    "tier_accuracy": 0.731,
+    "tiers": {
+      "nano": 8,
+      "super": 12,
+      "ultra": 6
+    },
+    "at": "2026-10-19T13:55:59+00:00"
+  },
+  "rows": [
+    {
+      "id": "q01",
+      "question": "When is the next county report due?",
+      "tier": "nano",
+      "expect_tier": "nano",
+      "tier_ok": true,
+      "reason": "a short factual lookup",
+      "recalled_ids": [
+        "demo-019",
+        "demo-007",
+        "demo-014",
+        "demo-012",
+        "demo-013",
+        "demo-023",
+        "demo-004",
+        "demo-003"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q02",
+      "question": "When is the scam spotting class?",
+      "tier": "nano",
+      "expect_tier": "nano",
+      "tier_ok": true,
+      "reason": "a short factual lookup",
+      "recalled_ids": [
+        "demo-024",
+        "demo-012",
+        "demo-014",
+        "demo-022",
+        "demo-019",
+        "demo-002",
+        "demo-005"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q03",
+      "question": "What did I decide about the coordinator, and did it change?",
+      "tier": "ultra",
+      "expect_tier": "ultra",
+      "tier_ok": true,
+      "reason": "asks for planning, comparison or a judgement call",
+      "recalled_ids": [
+        "demo-013",
+        "demo-016"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q04",
+      "question": "Should I still plan on hiring a coordinator this fall?",
+      "tier": "ultra",
+      "expect_tier": "ultra",
+      "tier_ok": true,
+      "reason": "asks for planning, comparison or a judgement call",
+      "recalled_ids": [
+        "demo-016",
+        "demo-013",
+        "demo-002"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q05",
+      "question": "Who is covering the repair nights in October?",
+      "tier": "nano",
+      "expect_tier": "nano",
+      "tier_ok": true,
+      "reason": "a short factual lookup",
+      "recalled_ids": [
+        "demo-020",
+        "demo-002",
+        "demo-007",
+        "demo-019"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q06",
+      "question": "Which grant did we apply for, and why not the state one?",
+      "tier": "nano",
+      "expect_tier": "super",
+      "tier_ok": false,
+      "reason": "a short factual lookup",
+      "recalled_ids": [
+        "demo-003",
+        "demo-006",
+        "demo-012",
+        "demo-013",
+        "demo-014",
+        "demo-018",
+        "demo-023",
+        "demo-002"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q07",
+      "question": "Can the county grant money pay for staff wages?",
+      "tier": "super",
+      "expect_tier": "super",
+      "tier_ok": true,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-012",
+        "demo-013",
+        "demo-021",
+        "demo-023",
+        "demo-004",
+        "demo-003",
+        "demo-007",
+        "demo-014"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q08",
+      "question": "What is the rule for accepting donated laptops?",
+      "tier": "super",
+      "expect_tier": "super",
+      "tier_ok": true,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-008",
+        "demo-021"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q09",
+      "question": "How should I format printed guides for the seniors class?",
+      "tier": "ultra",
+      "expect_tier": "super",
+      "tier_ok": false,
+      "reason": "asks for planning, comparison or a judgement call",
+      "recalled_ids": [
+        "demo-006",
+        "demo-022",
+        "demo-002",
+        "demo-005",
+        "demo-024",
+        "demo-012",
+        "demo-014",
+        "demo-019"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q10",
+      "question": "Why did the grant portal reject our budget PDF?",
+      "tier": "ultra",
+      "expect_tier": "nano",
+      "tier_ok": false,
+      "reason": "asks for planning, comparison or a judgement call",
+      "recalled_ids": [
+        "demo-004",
+        "demo-023",
+        "demo-012",
+        "demo-013",
+        "demo-003"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q11",
+      "question": "When is Mom's birthday dinner, and where?",
+      "tier": "nano",
+      "expect_tier": "nano",
+      "tier_ok": true,
+      "reason": "a short factual lookup",
+      "recalled_ids": [
+        "demo-017"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q12",
+      "question": "Am I cleared to lift the donated monitors yet?",
+      "tier": "super",
+      "expect_tier": "nano",
+      "tier_ok": false,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-021",
+        "demo-008",
+        "demo-003",
+        "demo-009"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q13",
+      "question": "How do we get borrowed hotspots returned on time?",
+      "tier": "super",
+      "expect_tier": "super",
+      "tier_ok": true,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-012",
+        "demo-013"
+      ],
+      "recalled": false,
+      "should_abstain": false
+    },
+    {
+      "id": "q14",
+      "question": "What hours is the tech hub open on weekends?",
+      "tier": "super",
+      "expect_tier": "nano",
+      "tier_ok": false,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-001",
+        "demo-020",
+        "demo-010",
+        "demo-006",
+        "demo-024",
+        "demo-013",
+        "demo-016",
+        "demo-009"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q15",
+      "question": "What do I need to gather for the October county report?",
+      "tier": "super",
+      "expect_tier": "super",
+      "tier_ok": true,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-019",
+        "demo-007",
+        "demo-014",
+        "demo-020",
+        "demo-012",
+        "demo-013",
+        "demo-023",
+        "demo-004"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q16",
+      "question": "Where do the county reports get submitted?",
+      "tier": "nano",
+      "expect_tier": "nano",
+      "tier_ok": true,
+      "reason": "a short factual lookup",
+      "recalled_ids": [
+        "demo-023",
+        "demo-004",
+        "demo-012",
+        "demo-013",
+        "demo-007",
+        "demo-014",
+        "demo-019",
+        "demo-003"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q17",
+      "question": "Who teaches the seniors class?",
+      "tier": "nano",
+      "expect_tier": "nano",
+      "tier_ok": true,
+      "reason": "a short factual lookup",
+      "recalled_ids": [
+        "demo-022",
+        "demo-002",
+        "demo-005",
+        "demo-006",
+        "demo-024",
+        "demo-012",
+        "demo-014",
+        "demo-019"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q18",
+      "question": "The Saturday web form double-booked slots. What was the workaround?",
+      "tier": "super",
+      "expect_tier": "super",
+      "tier_ok": true,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-015",
+        "demo-010",
+        "demo-011",
+        "demo-001"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q19",
+      "question": "How many attendees and devices were in the first quarterly report?",
+      "tier": "super",
+      "expect_tier": "super",
+      "tier_ok": true,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-014",
+        "demo-007",
+        "demo-012",
+        "demo-020",
+        "demo-019"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q20",
+      "question": "Help me plan October at the hub: what do I owe the county, and who is covering repair nights?",
+      "tier": "ultra",
+      "expect_tier": "ultra",
+      "tier_ok": true,
+      "reason": "asks for planning, comparison or a judgement call",
+      "recalled_ids": [
+        "demo-020",
+        "demo-002",
+        "demo-007",
+        "demo-019",
+        "demo-016",
+        "demo-013",
+        "demo-012",
+        "demo-014"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q21",
+      "question": "Compare Friday evening and Saturday turnout at the hub.",
+      "tier": "ultra",
+      "expect_tier": "ultra",
+      "tier_ok": true,
+      "reason": "asks for planning, comparison or a judgement call",
+      "recalled_ids": [
+        "demo-001",
+        "demo-015",
+        "demo-011",
+        "demo-020",
+        "demo-010",
+        "demo-006",
+        "demo-024",
+        "demo-013"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q22",
+      "question": "What did we plant in the garden bed?",
+      "tier": "super",
+      "expect_tier": "super",
+      "tier_ok": true,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-011"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q23",
+      "question": "How much was the county grant award?",
+      "tier": "super",
+      "expect_tier": "super",
+      "tier_ok": true,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-012",
+        "demo-013",
+        "demo-023",
+        "demo-004",
+        "demo-003",
+        "demo-007",
+        "demo-014",
+        "demo-019"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q24",
+      "question": "Did I file the July county report on time?",
+      "tier": "nano",
+      "expect_tier": "nano",
+      "tier_ok": true,
+      "reason": "a short factual lookup",
+      "recalled_ids": [
+        "demo-007",
+        "demo-019",
+        "demo-013",
+        "demo-004",
+        "demo-014",
+        "demo-016",
+        "demo-012",
+        "demo-023"
+      ],
+      "recalled": true,
+      "should_abstain": false
+    },
+    {
+      "id": "q25",
+      "question": "What is my dentist's phone number?",
+      "tier": "super",
+      "expect_tier": "nano",
+      "tier_ok": false,
+      "reason": "default",
+      "recalled_ids": [],
+      "recalled": null,
+      "should_abstain": true
+    },
+    {
+      "id": "q26",
+      "question": "What is the Wi-Fi password at the hub?",
+      "tier": "super",
+      "expect_tier": "nano",
+      "tier_ok": false,
+      "reason": "default",
+      "recalled_ids": [
+        "demo-001",
+        "demo-020",
+        "demo-010",
+        "demo-006",
+        "demo-024",
+        "demo-013",
+        "demo-016",
+        "demo-009"
+      ],
+      "recalled": null,
+      "should_abstain": true
+    }
+  ]
+}

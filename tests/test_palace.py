@@ -7,6 +7,7 @@ from palace.cli import main as cli_main
 from palace.config import Config, ConfigError
 from palace.memory import DemoMemory
 from palace.router import route
+from palace.tokenfactory import Completion
 
 
 # --- the real-palace guard ------------------------------------------------------------------
@@ -141,7 +142,8 @@ def test_turn_with_fake_model_uses_routed_tier():
     seen = {}
     def fake_chat(tier, msgs):
         seen["tier"] = tier
-        return "You planned to hire in July [demo-013], then reversed it in August [demo-016].", "fake-nemotron"
+        return Completion("You planned to hire in July [demo-013], then reversed it in August [demo-016].",
+                          "fake-nemotron", None, None)
     turn = run_turn("Should I still plan on the coordinator hire? Weigh the budget.", DemoMemory(), fake_chat)
     assert seen["tier"] == "ultra" and "[demo-016]" in turn.answer and turn.model == "fake-nemotron"
 

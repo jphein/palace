@@ -1,13 +1,77 @@
-"""palace ask "question" [--dry-run] [--json]  |  palace serve [--host H] [--port P]"""
+"""palace ask "question" [--dry-run] [--json]  |  palace serve [--host H] [--port P]  |  palace models
+palace eval [--live] [--out PATH]"""
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import sys
+from pathlib import Path
 
 from .agent import run_turn
 from .config import Config, ConfigError
 from .memory import open_memory
+
+
+def _client(cfg: Config):
+    from .tokenfactory import TokenFactory
+    return TokenFactory(cfg)
+
+
+def cmd_ask(cfg: Config, args) -> int:
+    memory = open_memory(cfg)
+    chat = None if args.dry_run else _client(cfg).chat
+    turn = run_turn(args.question, memory, chat, prices=cfg.prices)
+    if args.json:
+        print(json.dumps({"route": turn.route.__dict__, "egress": turn.egress, "answer": turn.answer, "model": turn.model,
+                          "usage": turn.usage, "cost_usd": turn.cost_usd,
+                          "memories": [m.__dict__ for m in turn.memories]}, indent=2))
+        return 0
+    print(f"route: {turn.route.tier} ({turn.route.reason})")
+    print("what leaves the house: " + (", ".join(f"{e['id']} ({e['chars']} chars)" for e in turn.egress) or "nothing"))
+    for m in turn.memories:
+        print(f"  {m.cite()} {m.wing}/{m.room}: {m.text[:100]}")
+    if turn.answer:
+        print("\n" + turn.answer)
+        u = turn.usage or {}
+        print(f"\n{turn.model} · {u.get('prompt_tokens')} in / {u.get('completion_tokens')} out · {u.get('latency_s')} s"
+              + (f" · ${turn.cost_usd:.6f}" if turn.cost_usd is not None else ""))
+    return 0
+
+
+def cmd_models(cfg: Config, args) -> int:
+    """Check each configured tier id against the live Token Factory catalog."""
+    live = set(_client(cfg).list_models())
+    nemotron = sorted(m for m in live if "nemotron" in m.lower())
+    ok = True
+    for tier, model in cfg.models.items():
+        found = model in live
+        ok &= found
+        print(f"{tier:5}  {model}  {'ok' if found else 'MISSING'}")
+    print(f"\n{len(live)} models in the catalog; Nemotron: " + (", ".join(nemotron) or "none"))
+    return 0 if ok else 1
+
+
+def cmd_eval(cfg: Config, args) -> int:
+    from .evals import load_questions, run_eval
+    chat = _client(cfg).chat if args.live else None
+    rep = run_eval(load_questions(), open_memory(cfg), chat, k=args.k, prices=cfg.prices)
+    s = rep["summary"]
+    s["at"] = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
+    out = Path(args.out) if args.out else Path("evals/runs") / f"{s['at'][:19].replace(':', '')}-{s['mode']}.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(rep, indent=2) + "\n")
+    print(f"{s['mode']} eval, {s['questions']} questions: recall@k {s['recall_at_k']} · tier accuracy {s['tier_accuracy']}"
+          f" · tiers {s['tiers']}")
+    if args.live:
+        print(f"citation valid {s['citation_valid']} · expected cited {s['expected_cited']} · abstain {s['abstain_accuracy']}"
+              f" · {s['prompt_tokens']}+{s['completion_tokens']} tokens · ${s['cost_usd']} · {s['latency_s']} s")
+    for r in rep["rows"]:
+        if r["tier_ok"] is False or r["recalled"] is False or r.get("citation_valid") is False:
+            print(f"  miss {r['id']}: tier {r['tier']} (want {r['expect_tier']}), recalled {r['recalled']}"
+                  + (f", invented {r['invented_ids']}" if r.get("invented_ids") else ""))
+    print(f"report: {out}")
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -20,6 +84,11 @@ def main(argv: list[str] | None = None) -> int:
     w = sub.add_parser("serve", help="web chat with the 'what leaves the house' panel")
     w.add_argument("--host", default="127.0.0.1")
     w.add_argument("--port", type=int, default=8765)
+    sub.add_parser("models", help="check the configured Nemotron ids against the live Token Factory catalog")
+    e = sub.add_parser("eval", help="score recall and routing (and, with --live, citations) on evals/questions.jsonl")
+    e.add_argument("--live", action="store_true", help="also call Nemotron and score the answers")
+    e.add_argument("--k", type=int, default=8)
+    e.add_argument("--out", help="report path (default evals/runs/<utc>-<mode>.json)")
     args = p.parse_args(argv)
 
     if args.cmd == "serve":
@@ -33,31 +102,13 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         cfg = Config.from_env()
-        memory = open_memory(cfg)
-        chat = None
-        if not args.dry_run:
-            from .tokenfactory import TokenFactory
-            tf = TokenFactory(cfg)
-            chat = lambda tier, msgs: (lambda c: (c.text, c.model))(tf.chat(tier, msgs))
-        turn = run_turn(args.question, memory, chat)
+        return {"ask": cmd_ask, "models": cmd_models, "eval": cmd_eval}[args.cmd](cfg, args)
     except ConfigError as e:
         print(f"palace: {e}", file=sys.stderr)
         return 2
     except OSError as e:  # URLError, timeouts, refused connections
         print(f"palace: network error: {getattr(e, 'reason', e)}", file=sys.stderr)
         return 3
-
-    if args.json:
-        print(json.dumps({"route": turn.route.__dict__, "egress": turn.egress, "answer": turn.answer, "model": turn.model,
-                          "memories": [m.__dict__ for m in turn.memories]}, indent=2))
-        return 0
-    print(f"route: {turn.route.tier} ({turn.route.reason})")
-    print("what leaves the house: " + (", ".join(f"{e['id']} ({e['chars']} chars)" for e in turn.egress) or "nothing"))
-    for m in turn.memories:
-        print(f"  {m.cite()} {m.wing}/{m.room}: {m.text[:100]}")
-    if turn.answer:
-        print("\n" + turn.answer)
-    return 0
 
 
 if __name__ == "__main__":

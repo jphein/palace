@@ -48,6 +48,8 @@ def turn_to_dict(turn: Turn, cfg: Config, live: bool) -> dict:
         "route": {"tier": turn.route.tier, "reason": turn.route.reason, "model": cfg.models[turn.route.tier]},
         "answer": turn.answer,
         "model": turn.model,
+        "usage": turn.usage,
+        "cost_usd": turn.cost_usd,
         "memories": [{"id": m.id, "date": m.date, "wing": m.wing, "room": m.room, "text": m.text, "score": m.score}
                      for m in turn.memories],
         "egress": {
@@ -167,7 +169,7 @@ def make_handler(cfg: Config, memory: MemoryBackend, chat: Callable | None,
                                   {"error": "This demo's hourly limit on model calls is used up; please try again later.",
                                    "limit": True})
             try:
-                turn = run_turn(q, memory, use_chat)
+                turn = run_turn(q, memory, use_chat, prices=cfg.prices)
             except Exception as e:  # model/network failure: report, don't crash the server
                 return self._json(HTTPStatus.BAD_GATEWAY, {"error": f"{type(e).__name__}: {e}"})
             return self._json(200, turn_to_dict(turn, cfg, live=use_chat is not None))
@@ -180,7 +182,7 @@ def build_chat(cfg: Config) -> Callable | None:
         return None
     from .tokenfactory import TokenFactory
     tf = TokenFactory(cfg)
-    return lambda tier, msgs: (lambda c: (c.text, c.model))(tf.chat(tier, msgs))
+    return tf.chat
 
 
 def serve(host: str = "127.0.0.1", port: int = 8765, cfg: Config | None = None) -> None:
