@@ -161,3 +161,6 @@ reader.
 ## License
 
 AGPL-3.0-or-later © 2026 Jeffrey Pine Hein. See [LICENSE](LICENSE). Built for [TechEMPOWER](https://techempower.org).
+
+Source: <https://github.com/jphein/palace> (a running server links it at `/version`). This repository's history starts
+from a squashed snapshot on 2026-09-27; development before that happened in a private repository, which is not published.

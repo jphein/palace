@@ -35,7 +35,7 @@ from .memory import DaemonMemory, MemoryBackend, open_memory
 STATIC = Path(__file__).resolve().parent / "static"
 MAX_QUESTION = 500
 MAX_BODY = 8 * 1024
-REPO = "https://github.com/jphein/palace-nemotron"  # GitHub redirects after a transfer to techempower-org
+REPO = "https://github.com/jphein/palace"  # the AGPL source offer; GitHub redirects after a transfer to techempower-org
 STARTED = time.time()
 
 
@@ -75,7 +75,7 @@ def version_doc() -> dict:
     try:
         from realm_sigil import version_dict  # optional; LGPL-3.0, github.com/jphein/sigil.realm.watch
     except ImportError:
-        return {"name": "palace-nemotron", "version": __version__, "hash": h}
+        return {"name": "palace-nemotron", "version": __version__, "hash": h, "repo": REPO}
     return version_dict("palace-nemotron", "Private personal AI on Nemotron via Nebius Token Factory", "fantasy", REPO,
                         hash=h, branch=_git("rev-parse", "--abbrev-ref", "HEAD") or "unknown",
                         dirty=bool(_git("status", "--porcelain")), started=time.strftime(
