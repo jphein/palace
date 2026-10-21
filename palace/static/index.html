@@ -60,6 +60,10 @@ input[type=text] { flex: 1; min-width: 0; font: inherit; padding: 10px 12px; bor
 button.go { font: inherit; padding: 10px 16px; border-radius: 10px; border: 0; background: var(--accent); color: var(--bg); font-weight: 600; cursor: pointer; }
 button.go:disabled { opacity: .5; cursor: progress; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 16px 14px; }
+.chips button.starter { background: var(--accent-soft); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--accent); font-weight: 600; }
+.start { margin: 0 16px 12px; padding: 10px 14px 10px 32px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); font-size: 14px; line-height: 1.45; }
+.start li + li { margin-top: 4px; }
+.kv.who { padding-bottom: 10px; border-bottom: 1px solid var(--line); }
 .chips button { font: inherit; font-size: 13px; background: var(--chip); color: var(--ink); border: 0; border-radius: 999px; padding: 5px 11px; cursor: pointer; }
 #egress { padding: 14px 16px; font-size: 14px; }
 #egress .empty { color: var(--muted); }
@@ -90,6 +94,11 @@ footer a { color: var(--muted); }
 <main>
   <section aria-label="Chat">
     <h2>Ask your palace <small id="who">synthetic demo: a fictional community tech hub</small></h2>
+    <ol class="start" id="start" aria-label="How to use this">
+      <li><b>Ask the starter question</b>: a decision that changed. Palace answers with the current one and says why.</li>
+      <li><b>Click a citation</b> like <code>[demo-016]</code> to see the memory it came from.</li>
+      <li><b>Read "What leaves the house"</b>: which steps ran on your server, which ran on Nemotron, and the exact text sent.</li>
+    </ol>
     <div id="log" aria-live="polite"></div>
     <form id="f">
       <input id="qin" type="text" maxlength="500" autocomplete="off" placeholder="What did I decide about the coordinator, and did it change?" aria-label="Question">
@@ -107,9 +116,10 @@ footer a { color: var(--muted); }
 (() => {
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const STARTER = "What did I decide about hiring a coordinator, and did it change?";
   const EXAMPLES = [
+    STARTER,
     "When is the next county report due?",
-    "What did I decide about hiring a coordinator, and did it change?",
     "What should I check before accepting donated laptops?",
     "Who is covering repair nights in October?",
     "Plan my October: what do I owe, and to whom?",
@@ -124,6 +134,7 @@ footer a { color: var(--muted); }
     try { localStorage.setItem("palace-theme", root.dataset.theme); } catch {}
   };
 
+  let memLabel = "local index";
   fetch("/api/status").then((r) => r.json()).then((s) => {
     const m = $("#mode");
     m.textContent = s.mode === "live" ? "live · Token Factory" : "preview · no model key";
@@ -131,11 +142,13 @@ footer a { color: var(--muted); }
     m.title = s.mode === "live" ? "Answers come from Nemotron on Nebius Token Factory"
       : "No NEBIUS_API_KEY: recall and routing run, and the panel shows exactly what would be sent. Nothing is sent.";
     $("#mem").textContent = s.memory;
+    memLabel = s.memory || memLabel;
   }).catch(() => { $("#mode").textContent = "offline"; });
 
   for (const q of EXAMPLES) {
     const b = document.createElement("button");
-    b.type = "button"; b.textContent = q;
+    b.type = "button"; b.textContent = q === STARTER ? "Start here: " + q : q;
+    if (q === STARTER) b.className = "starter";
     b.onclick = () => { $("#qin").value = q; ask(q); };
     $("#chips").append(b);
   }
@@ -146,15 +159,23 @@ footer a { color: var(--muted); }
   function highlight(id) {
     document.querySelectorAll(".mem").forEach((el) => el.classList.toggle("hl", el.dataset.id === id));
     const el = document.querySelector(`.mem[data-id="${CSS.escape(id)}"]`);
-    if (el) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (el) el.scrollIntoView({ block: "nearest", behavior: calm ? "auto" : "smooth" });
   }
   document.addEventListener("click", (e) => { const c = e.target.closest(".cite"); if (c) highlight(c.dataset.id); });
+
+  const tierName = (tier) => "Nemotron 3 " + String(tier || "").replace(/^./, (c) => c.toUpperCase());
 
   function renderEgress(t) {
     const e = t.egress, snip = e.snippets.reduce((a, s) => a + s.chars, 0);
     const mems = t.memories.map((m) => `<div class="mem" data-id="${esc(m.id)}"><b>[${esc(m.id)}${m.date ? ", " + esc(m.date) : ""}]</b>
       <span class="where">${esc(m.wing)}/${esc(m.room)} · score ${esc(m.score)}</span><br>${esc(m.text.slice(0, 600))}</div>`).join("");
     $("#egress").innerHTML = `
+      <dl class="kv who" aria-label="Which step ran where">
+        <dt>Recall</dt><dd>on your server · no model (${esc(memLabel)})</dd>
+        <dt>Routing</dt><dd>on your server · keyword rules, no model</dd>
+        <dt>Answer</dt><dd>${e.sent ? "<b>" + esc(tierName(t.route.tier)) + "</b> on Nebius Token Factory" : "Nemotron <b>not called</b> (preview)"}</dd>
+      </dl>
       <dl class="kv">
         <dt>Destination</dt><dd>${esc(e.destination)} ${e.sent ? "(sent)" : "<b>(not sent: preview)</b>"}</dd>
         <dt>Tier</dt><dd>Nemotron <b>${esc(t.route.tier)}</b>: ${esc(t.route.reason)}</dd>
@@ -180,7 +201,8 @@ footer a { color: var(--muted); }
       let r = await post(false), t = await r.json(), capped = null;
       if (r.status === 429 && t.limit) { capped = t.error; r = await post(true); t = await r.json(); }
       if (!r.ok) throw new Error(t.error || r.status);
-      const meta = `Nemotron ${esc(t.route.tier)} · ${esc(t.route.reason)} · ${t.memories.length} memories`;
+      const meta = `${t.answer ? "Answer: " + esc(tierName(t.route.tier)) + " (Token Factory)" : "Preview: no model called"} · routed on your server: ${esc(t.route.reason)} · ${t.memories.length} memories`;
+      const start = $("#start"); if (start) start.hidden = true;
       const body = t.answer ? `<div class="body">${withCites(t.answer)}</div>`
         : `<div class="note">${capped ? esc(capped) + " Showing a preview instead: nothing was sent." : "Preview mode: no model key is configured, so nothing was sent."} Recall and routing ran; see the panel for exactly what Nemotron would receive.</div>`;
       log.insertAdjacentHTML("beforeend", `<div class="a"><div class="meta">${meta}</div>${body}</div>`);

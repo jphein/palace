@@ -50,6 +50,17 @@ def test_page_favicon_and_status(preview):
     assert "name" in json.loads(_get(preview + "/version")[2])
 
 
+def test_page_onboards_and_labels_which_model_does_what(preview):
+    """The judges' asks: action first (a starter question), a 3-step card, and per-step model labels."""
+    body = _get(preview + "/")[2].decode()
+    assert 'id="start"' in body and body.count("<li>") >= 3, "3-step onboarding card"
+    assert "STARTER" in body and "Start here: " in body, "the coordinator reversal is the first example"
+    for row in ("<dt>Recall</dt>", "<dt>Routing</dt>", "<dt>Answer</dt>"):
+        assert row in body, row
+    assert "keyword rules, no model" in body and "on Nebius Token Factory" in body
+    assert "prefers-reduced-motion" in body
+
+
 def test_preview_ask_sends_nothing_but_shows_payload(preview):
     code, t = _post(preview + "/api/ask", json.dumps({"question": "When is the next county report due?"}).encode())
     assert code == 200 and t["mode"] == "preview" and t["answer"] is None
