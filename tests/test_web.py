@@ -47,7 +47,8 @@ def test_page_favicon_and_status(preview):
     assert _get(preview + "/favicon.svg")[1]["content-type"] == "image/svg+xml"
     status = json.loads(_get(preview + "/api/status")[2])
     assert status["mode"] == "preview" and "synthetic" in status["memory"]
-    assert "name" in json.loads(_get(preview + "/version")[2])
+    version = json.loads(_get(preview + "/version")[2])
+    assert "name" in version and "https://github.com/jphein/palace" in version.values(), "AGPL source offer"
 
 
 def test_preview_ask_sends_nothing_but_shows_payload(preview):
