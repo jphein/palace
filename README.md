@@ -112,6 +112,14 @@ This `public` branch is also the Open Agent Hackathon entry. The window opened o
 | **NVIDIA** | Nemotron 3 Nano / Super / Ultra answers each turn, via Nightshift lanes and Nebius Token Factory | Token Factory is pre-existing; Nightshift lanes are planned |
 | **Cursor** | The development environment for the window's code; prompts and session logs go in `docs/cursor-evidence/` | setting up |
 
+**How the sponsors run.**
+- **Zetaris** runs locally, from the participant Docker bundle on our own hardware: a separate machine on the home
+  network, which Palace reaches over Zetaris REST (design §3). It was installed and checked before the window.
+- **Meterless Nightshift** will run in a Windows VM on another local machine, reached over its OpenAI-compatible API.
+  The VM is being set up.
+- Both will be running for the demo recording and during judging. Between development sessions their machines sleep
+  to save power.
+
 [`metadata.json`](metadata.json) holds the same information in machine-readable form. Its statuses are updated
 with each commit.
 
