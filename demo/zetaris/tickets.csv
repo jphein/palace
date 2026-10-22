@@ -1,0 +1,51 @@
+ticket,opened,closed,device,donor,issue,tech,status
+T-1001,04/02/2026,04/07/2026,laptop,a neighbour,intake check,Priya S.,closed
+T-1002,04/07/2026,04/12/2026,laptop,Pine Ridge Credit Union,failed SSD after handout,Priya S.,closed (device recalled)
+T-1003,04/10/2026,04/13/2026,tablet,Pine Ridge Credit Union,intake check,Priya S.,closed
+T-1004,04/14/2026,04/20/2026,laptop,Pine Ridge Credit Union,intake check,Priya S.,closed
+T-1005,04/18/2026,04/24/2026,laptop,Riverside Library surplus,failed SSD after handout,Priya S.,closed (device recalled)
+T-1006,04/23/2026,04/30/2026,Chromebook,Riverside Library surplus,intake check,Priya S.,closed
+T-1007,04/26/2026,05/02/2026,hotspot,Hollis Dental,hotspot setup,Priya S.,closed
+T-1008,04/30/2026,05/05/2026,desktop,Kim family,intake check,Priya S.,closed
+T-1009,05/04/2026,05/07/2026,laptop,Riverside Library surplus,failed SSD after handout,Priya S.,closed (device recalled)
+T-1010,05/08/2026,05/12/2026,tablet,Pine Ridge Credit Union,intake check,Priya S.,closed
+T-1011,05/13/2026,05/19/2026,laptop,a neighbour,intake check,Priya S.,rejected (SMART fail)
+T-1012,05/17/2026,05/21/2026,desktop,St. Anne's parish,intake check,Priya S.,rejected (SMART fail)
+T-1013,05/21/2026,05/26/2026,hotspot,Kim family,hotspot setup,Priya S.,closed
+T-1014,05/24/2026,05/27/2026,laptop,Pine Ridge Credit Union,intake check,Priya S.,closed
+T-1015,05/29/2026,05/31/2026,desktop,Hollis Dental,intake check,Priya S.,closed
+T-1016,06/03/2026,06/11/2026,laptop,St. Anne's parish,intake check,Priya S.,closed
+T-1017,06/06/2026,06/12/2026,laptop,Kim family,intake check,Priya S.,closed
+T-1018,06/09/2026,06/14/2026,laptop,Kim family,intake check,Priya S.,closed
+T-1019,06/14/2026,06/15/2026,Chromebook,Hollis Dental,intake check,Priya S.,closed
+T-1020,06/19/2026,06/25/2026,hotspot,County IT surplus,hotspot setup,Priya S.,closed
+T-1021,06/24/2026,06/27/2026,hotspot,a neighbour,hotspot setup,Priya S.,closed
+T-1022,06/29/2026,07/01/2026,hotspot,Riverside Library surplus,hotspot setup,Priya S.,closed
+T-1023,07/03/2026,07/11/2026,tablet,Hollis Dental,intake check,Priya S.,closed
+T-1024,07/06/2026,07/10/2026,desktop,Hollis Dental,intake check,Priya S.,closed
+T-1025,07/09/2026,07/12/2026,Chromebook,Hollis Dental,intake check,Priya S.,closed
+T-1026,07/12/2026,07/17/2026,laptop,County IT surplus,intake check,Priya S.,closed
+T-1027,07/15/2026,07/21/2026,laptop,County IT surplus,intake check,Priya S.,closed
+T-1028,07/20/2026,07/28/2026,desktop,St. Anne's parish,intake check,Priya S.,closed
+T-1029,07/25/2026,08/02/2026,Chromebook,County IT surplus,intake check,Priya S.,closed
+T-1030,07/28/2026,07/31/2026,hotspot,County IT surplus,hotspot setup,Priya S.,closed
+T-1031,08/02/2026,08/08/2026,hotspot,County IT surplus,hotspot setup,Priya S.,closed
+T-1032,08/06/2026,08/12/2026,Chromebook,Pine Ridge Credit Union,intake check,Priya S.,closed
+T-1033,08/09/2026,08/10/2026,desktop,Pine Ridge Credit Union,intake check,Priya S.,rejected (SMART fail)
+T-1034,08/12/2026,08/15/2026,tablet,a neighbour,intake check,Priya S.,closed
+T-1035,08/15/2026,08/21/2026,desktop,a neighbour,intake check,Priya S.,closed
+T-1036,08/20/2026,08/23/2026,desktop,a neighbour,intake check,Priya S.,closed
+T-1037,08/24/2026,08/27/2026,laptop,Hollis Dental,intake check,Priya S.,closed
+T-1038,08/28/2026,09/03/2026,desktop,Kim family,intake check,Priya S.,closed
+T-1039,09/02/2026,09/04/2026,hotspot,Pine Ridge Credit Union,hotspot setup,Priya S.,closed
+T-1040,09/05/2026,09/14/2026,Chromebook,Riverside Library surplus,intake check,Priya S.,closed
+T-1041,09/08/2026,09/11/2026,laptop,Hollis Dental,intake check,Priya S.,closed
+T-1042,09/11/2026,09/12/2026,desktop,County IT surplus,intake check,Priya S.,closed
+T-1043,09/15/2026,09/17/2026,tablet,Riverside Library surplus,intake check,Priya S.,closed
+T-1044,09/20/2026,09/25/2026,hotspot,Pine Ridge Credit Union,hotspot setup,Priya S.,closed
+T-1045,09/23/2026,09/25/2026,Chromebook,Kim family,intake check,Priya S.,closed
+T-1046,09/27/2026,10/04/2026,desktop,St. Anne's parish,intake check,Priya S.,closed
+T-1047,10/01/2026,10/06/2026,hotspot,Pine Ridge Credit Union,hotspot setup,D. Okafor,closed
+T-1048,10/06/2026,10/10/2026,tablet,Riverside Library surplus,intake check,D. Okafor,closed
+T-1049,10/10/2026,10/15/2026,desktop,Kim family,intake check,D. Okafor,closed
+T-1050,10/13/2026,,laptop,Hollis Dental,intake check,D. Okafor,closed

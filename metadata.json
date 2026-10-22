@@ -1,0 +1,36 @@
+{
+  "project": "Palace",
+  "hackathon": "Open Agent Hackathon 2026",
+  "track": "Wildcard [Tinkerer]: Bring Your Own Project",
+  "team": "Palace (solo)",
+  "repo": "https://github.com/jphein/palace",
+  "branch": "public",
+  "license": "AGPL-3.0-or-later",
+  "window_opened_utc": "2026-10-22T00:00:00Z",
+  "pre_existing": [
+    "recall over a synthetic palace (offline BM25 or a memory daemon over HTTP)",
+    "keyword tier router (Nano / Super / Ultra)",
+    "grounded prompt with numbered citations and the 'what leaves the house' egress record",
+    "web chat and egress panel, container, hourly cap, real-palace guard",
+    "Nebius Token Factory client for Nemotron 3 Nano / Super / Ultra, palace models, palace eval (26 questions)"
+  ],
+  "declared_pre_window_prep": {
+    "written": "2026-10-19",
+    "committed": "in the window's first commit",
+    "files": ["docs/open-agent-design.md", "demo/zetaris/"]
+  },
+  "sponsors": {
+    "zetaris": {"where": "source of record for the organisation's records, over Zetaris REST", "status": "planned"},
+    "meterless": {
+      "engines": ["H-MEM memory layer", "World Model event log"],
+      "provider": "Nightshift as the primary AI provider",
+      "status": "planned"
+    },
+    "nvidia": {
+      "where": "Nemotron 3 Nano / Super / Ultra answer each turn",
+      "via": ["Nebius Token Factory (pre-existing)", "Meterless Nightshift lanes (planned)"],
+      "status": "partly pre-existing"
+    },
+    "cursor": {"where": "development environment for the window's code; evidence in docs/cursor-evidence/", "status": "setting up"}
+  }
+}
