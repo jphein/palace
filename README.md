@@ -77,6 +77,25 @@ the keyword router's (see the "miss" lines from `palace eval`).
 5. Optional Tavily web-search tool.
 6. Demo video (≤3 min) naming Token Factory and Nemotron; README feedback section.
 
+## Open Agent Hackathon 2026 (Wildcard [Tinkerer]: Bring Your Own Project)
+
+This `public` branch is also the Open Agent Hackathon entry. The window opened on 22 Oct 2026 at 00:00 UTC.
+- **Everything committed before that is pre-existing**: recall, the keyword router, the egress log, the web chat
+  and the Token Factory client.
+- **Declared pre-window prep**, written on 2026-10-19 and committed in the window's first commit:
+  [`docs/open-agent-design.md`](docs/open-agent-design.md) and the synthetic dataset in [`demo/zetaris/`](demo/zetaris/).
+- The design's §1 table lists, line by line, what is pre-existing and what is built in the window.
+
+| Sponsor | Where it sits in Palace | Status |
+|---|---|---|
+| **Zetaris** | The source of record: the organisation's decisions, tickets and ledgers, queried over Zetaris REST next to the personal memory | planned (window work) |
+| **Meterless** | The H-MEM memory layer (provenance, confidence, supersession) and the World Model event log; **Nightshift** as the primary AI provider | planned (window work) |
+| **NVIDIA** | Nemotron 3 Nano / Super / Ultra answers each turn, via Nightshift lanes and Nebius Token Factory | Token Factory is pre-existing; Nightshift lanes are planned |
+| **Cursor** | The development environment for the window's code; prompts and session logs go in `docs/cursor-evidence/` | setting up |
+
+[`metadata.json`](metadata.json) holds the same information in machine-readable form. Its statuses are updated
+with each commit.
+
 ## License
 
 AGPL-3.0-or-later © 2026 Jeffrey Pine Hein. See [LICENSE](LICENSE). Built for [TechEMPOWER](https://techempower.org).

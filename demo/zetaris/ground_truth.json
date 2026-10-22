@@ -1,0 +1,22 @@
+{
+  "q2_attendees": 41,
+  "q2_devices_out": 12,
+  "q3q4_attendees_since_jul": 72,
+  "devices_out_since_jul": 27,
+  "devices_out_since_jul_by_type": {
+    "Chromebook": 5,
+    "desktop": 8,
+    "hotspot": 6,
+    "laptop": 4,
+    "tablet": 4
+  },
+  "smart_rejections": 3,
+  "active_staffing_decision": "DEC-2026-008",
+  "rows": {
+    "decisions": 10,
+    "meeting_notes": 10,
+    "class_sessions": 28,
+    "tickets": 50,
+    "device_ledger": 39
+  }
+}

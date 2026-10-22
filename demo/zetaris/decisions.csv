@@ -1,0 +1,11 @@
+decision_id,date,body,topic,decision,status,supersedes
+DEC-2026-001,2026-03-02,board,hours,Open Saturdays 10:00-14:00; drop Friday evenings.,active,
+DEC-2026-002,2026-03-15,board,grants,"Apply for the county Digital Inclusion mini-grant ($8,000), not the state grant.",active,
+DEC-2026-003,2026-05-01,board,grants,"Report to the county quarterly: Jul 15, Oct 15, Jan 15.",active,
+DEC-2026-004,2026-05-12,ops,devices,SMART-check every donated machine before accepting it.,active,
+DEC-2026-005,2026-06-03,ops,signup,Move the class sign-up sheet to a web form; keep paper as backup.,active,
+DEC-2026-006,2026-07-10,board,staffing,"Hire a part-time coordinator in the fall, funded from general donations.",superseded,
+DEC-2026-007,2026-07-22,ops,signup,Cap each Saturday slot at 4 and send a confirmation text.,active,
+DEC-2026-008,2026-08-05,board,staffing,No coordinator hire this fall (donations 40% under plan). Revisit in January.,active,DEC-2026-006
+DEC-2026-009,2026-08-30,ops,hotspots,"Hotspot loans are one week, with a text reminder on day 6.",active,
+DEC-2026-010,2026-09-25,board,classes,"Co-host 'scam spotting' with the library, Nov 7 10:00, library community room.",active,
