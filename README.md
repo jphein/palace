@@ -79,6 +79,25 @@ the keyword router's (see the "miss" lines from `palace eval`).
 
 ## Open Agent Hackathon 2026 (Wildcard [Tinkerer]: Bring Your Own Project)
 
+**The five questions** (from the organisers' Day 1 brief):
+- **Who is the user?** The volunteer coordinator of a small community tech hub (a nonprofit that refurbishes donated
+  computers and runs digital-skills classes), who answers to its board and to a county grant.
+- **What is the problem?** Before the quarterly county report, the coordinator has to state what was decided and give
+  the numbers, but their own memory, the meeting notes and the organisation's records disagree. In the demo data, an
+  Aug 1 meeting note still says a coordinator hire is on; the decision log reversed it on Aug 5.
+- **What goes in?** A plain-language question, the coordinator's own memories (kept on their server), and the
+  organisation's records in Zetaris: decisions, meeting notes, class sessions, repair tickets and the device ledger.
+- **What comes out?** A short answer whose numbers come from the records. Every claim cites a memory or a Zetaris
+  query, the source of record is named when sources disagree, and the "what leaves the house" record shows what
+  was sent to the model.
+- **Why does this need an agent?** Each question needs tools chosen at run time: which Zetaris queries to run with
+  which parameters, which memories to trust, and which model tier is worth the cost. Then it needs a judgement about
+  which source wins when they conflict over time. A single prompt can't query Zetaris, and a script can't read
+  free-text notes or weigh a superseded decision.
+
+Status: that output is the target. Recall, citations and the egress record work today. The Zetaris queries and the
+source-of-record judgement are what this window builds.
+
 This `public` branch is also the Open Agent Hackathon entry. The window opened on 22 Oct 2026 at 00:00 UTC.
 - **Everything committed before that is pre-existing**: recall, the keyword router, the egress log, the web chat
   and the Token Factory client.
