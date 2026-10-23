@@ -183,6 +183,12 @@ No headers, keys or bearer tokens are ever logged. Endpoints are logged as paths
 
 ## 7. Cursor
 
+> **Update, 23 Oct 2026 (in the window).** On 22 Oct the organisers made Cursor optional ("any AI coding tool …
+> Cursor, Claude Code, Windsurf or GitHub Copilot"), and no Cursor credits come with the event. Palace still uses
+> Cursor for part of the window's code, on its free plan, and keeps the evidence as described below. The rest is
+> built in Claude Code. What the change keeps unchanged is that at least one Meterless engine must work in a feature,
+> shown by a passing test or a live demo (§4).
+
 - Development of the engines, the Zetaris adapter and the Nightshift provider happens in Cursor (its agent CLI),
   starting from each engine's `AGENTS.md` and Meterless's POWER prompt.
 - The README and `metadata.json` say how Cursor was used. Prompts and session logs are kept in
