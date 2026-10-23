@@ -110,7 +110,7 @@ This `public` branch is also the Open Agent Hackathon entry. The window opened o
 | **Zetaris** | The source of record: the organisation's decisions, tickets and ledgers, queried over Zetaris REST next to the personal memory | planned (window work) |
 | **Meterless** | The H-MEM memory layer (provenance, confidence, supersession) and the World Model event log; **Nightshift** as the primary AI provider | planned (window work) |
 | **NVIDIA** | Nemotron 3 Nano / Super / Ultra answers each turn, via Nightshift lanes and Nebius Token Factory | Token Factory is pre-existing; Nightshift lanes are planned |
-| **Cursor** | The development environment for the window's code; prompts and session logs go in `docs/cursor-evidence/` | setting up |
+| **Cursor** | Used for part of the window's code (HackOS made Cursor optional on 22 Oct); prompts and session logs go in `docs/cursor-evidence/` | signed in; first session pending |
 
 **Grounded in Zetaris.** Every fact in an answer comes from a cited Zetaris record or a cited memory, so each answer
 traces back to the data it rests on. Palace does no web search. If the optional web search on the roadmap (item 5) is
