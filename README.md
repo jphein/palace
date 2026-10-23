@@ -112,6 +112,10 @@ This `public` branch is also the Open Agent Hackathon entry. The window opened o
 | **NVIDIA** | Nemotron 3 Nano / Super / Ultra answers each turn, via Nightshift lanes and Nebius Token Factory | Token Factory is pre-existing; Nightshift lanes are planned |
 | **Cursor** | The development environment for the window's code; prompts and session logs go in `docs/cursor-evidence/` | setting up |
 
+**Grounded in Zetaris.** Every fact in an answer comes from a cited Zetaris record or a cited memory, so each answer
+traces back to the data it rests on. Palace does no web search. If the optional web search on the roadmap (item 5) is
+added, its results will be context only, never the cited source of a fact.
+
 **How the sponsors run.**
 - **Zetaris** runs locally, from the participant Docker bundle on our own hardware: a separate machine on the home
   network, which Palace reaches over Zetaris REST (design §3). It was installed and checked before the window.
