@@ -119,10 +119,16 @@ added, its results will be context only, never the cited source of a fact.
 **How the sponsors run.**
 - **Zetaris** runs locally, from the participant Docker bundle on our own hardware: a separate machine on the home
   network, which Palace reaches over Zetaris REST (design §3). It was installed and checked before the window.
-- **Meterless Nightshift** will run in a Windows VM on another local machine, reached over its OpenAI-compatible API.
-  The VM is being set up.
+- **Meterless Nightshift** 1.2.3 runs in a Windows 10 VM on another local machine. Its OpenAI-compatible API answers
+  from the dev machine: `GET /v1/models` lists the `meterless/*` routes, and a call without the runtime token gets 401.
+  NVIDIA goes into Nightshift's Providers tab next. Palace's provider integration is window work.
 - Both will be running for the demo recording and during judging. Between development sessions their machines sleep
   to save power.
+
+**Known limitations.**
+- On a fresh Windows 10, Nightshift 1.2.3's `meterlessd.exe` won't start without the Microsoft Visual C++ runtime
+  (`VCRUNTIME140.dll`), which its installer doesn't include. It exits with 0xC0000135. Installing Microsoft's
+  `vc_redist.x64.exe` first fixes it.
 
 [`metadata.json`](metadata.json) holds the same information in machine-readable form. Its statuses are updated
 with each commit.
