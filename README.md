@@ -24,13 +24,16 @@ question ──► recall (palace-daemon: vector + BM25 + graph)  ──► top 
 ## Run
 
 ```bash
-python3 -m pytest -q                                   # 56 tests, offline
+python3 -m pytest -q                                   # offline; the live Zetaris tests skip without ZETARIS_*
 python3 -m palace ask "When is the next county report due?" --dry-run
 python3 -m palace eval                                 # offline: recall@k + router tier accuracy
 NEBIUS_API_KEY=... python3 -m palace models            # check the tier ids against the live catalog
 NEBIUS_API_KEY=... python3 -m palace ask "Should I still plan on hiring a coordinator?"
 NEBIUS_API_KEY=... python3 -m palace eval --live       # also: citation validity, abstention, tokens, cost
 python3 -m palace serve                                # web chat on http://127.0.0.1:8765/
+# with Zetaris (the organisation's records; load them once with demo/zetaris/load_zetaris.py):
+ZETARIS_BASE_URL=http://localhost:3000 ZETARIS_EMAIL=... ZETARIS_PASSWORD=... \
+  NEBIUS_API_KEY=... python3 -m palace ask "What numbers go in the October county report?"
 ```
 
 **Web chat.** `palace serve` opens a chat page with a **"What leaves the house"** panel: for every answer it shows the Nemotron tier and why it was chosen, the memories recalled (with ids and dates), how many characters of memory left, and the exact messages sent to Token Factory. Citations in an answer are clickable and highlight the memory they came from. Without `NEBIUS_API_KEY` the page runs in **preview** mode: recall and routing run, and the panel shows what *would* be sent, but nothing is. Light and dark themes; no JavaScript dependencies; binds to `127.0.0.1` unless you pass `--host`.
@@ -42,6 +45,8 @@ python3 -m palace serve                                # web chat on http://127.
 | `PALACE_MODEL_NANO/SUPER/ULTRA` | Model ids per tier (defaults verified in the live catalog 2026-10-19; `palace models` re-checks) |
 | `PALACE_PRICE_NANO/SUPER/ULTRA` | `"input,output"` USD per 1M tokens, for the per-answer cost (defaults in `config.py`) |
 | `PALACE_URL`, `PALACE_API_KEY` | A **demo** palace-daemon; omit to use the offline synthetic palace |
+| `ZETARIS_BASE_URL` | The Zetaris UI proxy origin, e.g. `http://localhost:3000`; omit to answer from memory alone |
+| `ZETARIS_EMAIL`, `ZETARIS_PASSWORD` | A Zetaris login (the token and org id come from the login response); or `ZETARIS_TOKEN` + `ZETARIS_ORG_ID` |
 | `PALACE_FORBIDDEN_HOSTS` | Comma-separated hosts that serve a **real** palace (added to the files below); subdomains are covered too |
 | `PALACE_FORBIDDEN_HOSTS_FILE` | One more deny-list file (default files: `~/.config/palace/forbidden-hosts`, `./.forbidden-hosts`) |
 | `PALACE_ALLOW_HOSTS` | Opts a LAN-looking **demo** daemon back in. It never overrides the deny-list |
@@ -95,8 +100,12 @@ the keyword router's (see the "miss" lines from `palace eval`).
   which source wins when they conflict over time. A single prompt can't query Zetaris, and a script can't read
   free-text notes or weigh a superseded decision.
 
-Status: that output is the target. Recall, citations and the egress record work today. The Zetaris queries and the
-source-of-record judgement are what this window builds.
+Status (26 Oct): Zetaris works end to end. `palace ask` and the web chat pick read-only query templates for the
+question (`palace/orgplan.py`), run them on Zetaris (`palace/adapters/zetaris.py`), and send the record sets to
+Nemotron next to the memories. Each record set is cited as `[zetaris:q-…]` and listed in the egress record. A
+live run answers "What numbers go in the October county report?" with 72 attendees and 27 devices, which match
+`demo/zetaris/ground_truth.json`. If Zetaris is offline the answer says so and gives no numbers. Still in progress:
+the stale-note judgement (MTG-0801 isn't flagged yet) and the Meterless engines.
 
 This `public` branch is also the Open Agent Hackathon entry. The window opened on 22 Oct 2026 at 00:00 UTC.
 - **Everything committed before that is pre-existing**: recall, the keyword router, the egress log, the web chat
@@ -107,7 +116,7 @@ This `public` branch is also the Open Agent Hackathon entry. The window opened o
 
 | Sponsor | Where it sits in Palace | Status |
 |---|---|---|
-| **Zetaris** | The source of record: the organisation's decisions, tickets and ledgers, queried over Zetaris REST next to the personal memory | planned (window work) |
+| **Zetaris** | The source of record: the organisation's decisions, tickets and ledgers, queried over Zetaris REST next to the personal memory | **working** (adapter, query templates, live tests against our Zetaris) |
 | **Meterless** | The H-MEM memory layer (provenance, confidence, supersession) and the World Model event log; **Nightshift** as the primary AI provider | planned (window work) |
 | **NVIDIA** | Nemotron 3 Nano / Super / Ultra answers each turn, via Nightshift lanes and Nebius Token Factory | Token Factory is pre-existing; Nightshift lanes are planned |
 | **Cursor** | Used for part of the window's code (HackOS made Cursor optional on 22 Oct); prompts and session logs go in `docs/cursor-evidence/` | signed in; first session pending |
@@ -118,7 +127,9 @@ added, its results will be context only, never the cited source of a fact.
 
 **How the sponsors run.**
 - **Zetaris** runs locally, from the participant Docker bundle on our own hardware: a separate machine on the home
-  network, which Palace reaches over Zetaris REST (design §3). It was installed and checked before the window.
+  network, which Palace reaches over Zetaris REST (design §3). It was installed and checked before the window. The
+  five demo tables are loaded as the Lightning database `PALACE_DEMO` (`demo/zetaris/load_zetaris.py`), and
+  `tests/test_zetaris_live.py` checks the templates against them on the real engine.
 - **Meterless Nightshift** 1.2.3 runs in a Windows 10 VM on another local machine. Its OpenAI-compatible API answers
   from the dev machine: `GET /v1/models` lists the `meterless/*` routes, and a call without the runtime token gets 401.
   NVIDIA goes into Nightshift's Providers tab next. Palace's provider integration is window work.

@@ -56,8 +56,15 @@ def turn_to_dict(turn: Turn, cfg: Config, live: bool) -> dict:
             "destination": urlparse(cfg.base_url).hostname,
             "sent": live,
             "snippets": [{**e, "date": by_id[e["id"]].date} for e in turn.egress],
+            "records": turn.record_egress,
             "total_chars": sum(len(msg["content"]) for msg in turn.prompt),
             "messages": turn.prompt,
+        },
+        "zetaris": {
+            "status": turn.org_status,
+            "records": [{"id": rs.id, "template": st.template, "params": st.params, "why": st.why, "sql": rs.sql,
+                         "columns": rs.columns, "rows": rs.rows, "row_count": rs.row_count, "latency_ms": rs.latency_ms}
+                        for st, rs in zip(turn.plan, turn.records)],
         },
     }
 
@@ -103,7 +110,7 @@ class HourlyCap:
 
 
 def make_handler(cfg: Config, memory: MemoryBackend, chat: Callable | None,
-                 cap: HourlyCap | None = None) -> type[BaseHTTPRequestHandler]:
+                 cap: HourlyCap | None = None, org=None) -> type[BaseHTTPRequestHandler]:
     live = chat is not None
     cap = cap or HourlyCap(0)
     status = {
@@ -111,6 +118,8 @@ def make_handler(cfg: Config, memory: MemoryBackend, chat: Callable | None,
         "memory": "palace-daemon" if isinstance(memory, DaemonMemory) else "synthetic demo palace (offline)",
         "models": cfg.models,
         "model_host": urlparse(cfg.base_url).hostname,
+        "zetaris": "connected" if org is not None and not hasattr(org, "err") else
+                   ("offline" if org is not None else "not configured"),
         "version": __version__,
     }
 
@@ -169,7 +178,7 @@ def make_handler(cfg: Config, memory: MemoryBackend, chat: Callable | None,
                                   {"error": "This demo's hourly limit on model calls is used up; please try again later.",
                                    "limit": True})
             try:
-                turn = run_turn(q, memory, use_chat, prices=cfg.prices)
+                turn = run_turn(q, memory, use_chat, prices=cfg.prices, org=org)
             except Exception as e:  # model/network failure: report, don't crash the server
                 return self._json(HTTPStatus.BAD_GATEWAY, {"error": f"{type(e).__name__}: {e}"})
             return self._json(200, turn_to_dict(turn, cfg, live=use_chat is not None))
@@ -186,16 +195,22 @@ def build_chat(cfg: Config) -> Callable | None:
 
 
 def serve(host: str = "127.0.0.1", port: int = 8765, cfg: Config | None = None) -> None:
+    from .adapters.zetaris import Unreachable, ZetarisOffline, open_zetaris
     cfg = cfg or Config.from_env()
     memory = open_memory(cfg)
     chat = build_chat(cfg)
     try:
+        org = open_zetaris()
+    except ZetarisOffline as e:
+        org = Unreachable(e)
+    try:
         limit = int(os.environ.get("PALACE_MAX_ASKS_PER_HOUR") or 0)
     except ValueError:
         limit = 0
-    httpd = ThreadingHTTPServer((host, port), make_handler(cfg, memory, chat, HourlyCap(limit)))
+    httpd = ThreadingHTTPServer((host, port), make_handler(cfg, memory, chat, HourlyCap(limit), org))
     mode = "LIVE (Token Factory)" if chat else "PREVIEW (no NEBIUS_API_KEY: nothing is sent)"
-    print(f"palace: http://{host}:{port}/  mode={mode}  cap={limit or 'none'}/hour", file=sys.stderr)
+    print(f"palace: http://{host}:{port}/  mode={mode}  cap={limit or 'none'}/hour  "
+          f"zetaris={'on' if org is not None else 'off'}", file=sys.stderr)
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
