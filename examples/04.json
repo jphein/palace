@@ -1,0 +1,49 @@
+{
+  "route": {
+    "tier": "nano",
+    "reason": "a short factual lookup"
+  },
+  "egress": [
+    {
+      "id": "demo-017",
+      "chars": 82
+    }
+  ],
+  "answer": "Mom's birthday dinner is Sunday, September 20th at a Thai restaurant for 6 people [demo-017]. Her birthday itself is September 21st.",
+  "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+  "usage": {
+    "prompt_tokens": 389,
+    "completion_tokens": 545,
+    "latency_s": 11.796
+  },
+  "cost_usd": null,
+  "provider": "meterless",
+  "receipt_id": "rcpt_req_26ldgp7k",
+  "hmem": {
+    "scores": {
+      "demo-017": 0.292273
+    },
+    "retrievalReason": "1 of 1 memories at or above 0",
+    "ledger": {
+      "create": 1,
+      "read": 1
+    },
+    "superseded": {}
+  },
+  "memories": [
+    {
+      "id": "demo-017",
+      "date": "2026-08-19",
+      "wing": "family",
+      "room": "planning",
+      "text": "Mom's birthday is September 21. Book the Thai place for Sunday the 20th, 6 people.",
+      "score": 6.293
+    }
+  ],
+  "zetaris": {
+    "status": null,
+    "plan": [],
+    "egress": [],
+    "records": []
+  }
+}

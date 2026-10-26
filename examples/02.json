@@ -1,0 +1,170 @@
+{
+  "route": {
+    "tier": "ultra",
+    "reason": "asks for planning, comparison or a judgement call"
+  },
+  "egress": [
+    {
+      "id": "demo-016",
+      "chars": 112
+    },
+    {
+      "id": "demo-013",
+      "chars": 118
+    },
+    {
+      "id": "demo-002",
+      "chars": 129
+    }
+  ],
+  "answer": "No \u2014 the fall coordinator hire is off. The active decision (DEC\u20112026\u2011008, 2026\u201108\u201105) supersedes the July approval and states \u201cNo coordinator hire this fall (donations 40% under plan). Revisit in January.\u201d [zetaris:q-fee523ac]\n\nThe 1\u202fAugust ops note (MTG\u20110801) still references the September posting, but it was overtaken by the 5\u202fAugust board decision that pulled the posting [zetaris:q-d4abc1c4]. The July memory (demo\u2011013) is marked **SUPERSEDED by demo\u2011016**, which confirms the reversal.",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "usage": {
+    "prompt_tokens": 1869,
+    "completion_tokens": 366,
+    "latency_s": 5.306
+  },
+  "cost_usd": null,
+  "provider": "meterless",
+  "receipt_id": "rcpt_req_3i4yacld",
+  "hmem": {
+    "scores": {
+      "demo-016": 0.345919,
+      "demo-013": 0.113164,
+      "demo-002": 0.080754
+    },
+    "retrievalReason": "3 of 3 memories at or above 0; superseded and penalised: demo-013",
+    "ledger": {
+      "create": 3,
+      "update": 1,
+      "read": 3
+    },
+    "superseded": {
+      "demo-013": "demo-016"
+    }
+  },
+  "memories": [
+    {
+      "id": "demo-016",
+      "date": "2026-08-05",
+      "wing": "hub",
+      "room": "decisions",
+      "text": "Reversed the July decision: no coordinator hire this fall. Donations came in 40% under plan; revisit in January.",
+      "score": 7.071
+    },
+    {
+      "id": "demo-013",
+      "date": "2026-07-10",
+      "wing": "hub",
+      "room": "decisions",
+      "text": "Decided to hire a part-time coordinator in the fall, funded from general donations (the county grant can't pay wages).",
+      "score": 4.714
+    },
+    {
+      "id": "demo-002",
+      "date": "2026-03-09",
+      "wing": "hub",
+      "room": "planning",
+      "text": "Plan for spring: two laptop-repair nights a month, one 'phone basics' class for seniors, and a sign-up sheet at the library desk.",
+      "score": 2.173
+    }
+  ],
+  "zetaris": {
+    "status": "ok",
+    "plan": [
+      {
+        "template": "decisions",
+        "params": {
+          "topic": "staffing"
+        },
+        "why": "the decision log is the source of record for staffing"
+      },
+      {
+        "template": "meeting_notes",
+        "params": {
+          "search": "coordinator"
+        },
+        "why": "meeting notes that mention the coordinator"
+      }
+    ],
+    "egress": [
+      {
+        "id": "zetaris:q-fee523ac",
+        "rows": 2,
+        "row_count": 2,
+        "chars": 516,
+        "latency_ms": 221
+      },
+      {
+        "id": "zetaris:q-d4abc1c4",
+        "rows": 3,
+        "row_count": 3,
+        "chars": 607,
+        "latency_ms": 189
+      }
+    ],
+    "records": [
+      {
+        "id": "zetaris:q-fee523ac",
+        "sql": "SELECT decision_id, date, decision, status, supersedes FROM PALACE_DEMO.decisions WHERE topic = 'staffing' ORDER BY date",
+        "columns": [
+          "decision_id",
+          "date",
+          "decision",
+          "status",
+          "supersedes"
+        ],
+        "rows": [
+          [
+            "DEC-2026-006",
+            "2026-07-10",
+            "Hire a part-time coordinator in the fall, funded from general donations.",
+            "superseded",
+            ""
+          ],
+          [
+            "DEC-2026-008",
+            "2026-08-05",
+            "No coordinator hire this fall (donations 40% under plan). Revisit in January.",
+            "active",
+            "DEC-2026-006"
+          ]
+        ],
+        "row_count": 2,
+        "latency_ms": 221
+      },
+      {
+        "id": "zetaris:q-d4abc1c4",
+        "sql": "SELECT meeting_id, date, body, notes FROM PALACE_DEMO.meeting_notes WHERE lower(notes) LIKE '%coordinator%' ORDER BY date",
+        "columns": [
+          "meeting_id",
+          "date",
+          "body",
+          "notes"
+        ],
+        "rows": [
+          [
+            "MTG-0710",
+            "2026-07-10",
+            "board",
+            "Coordinator: yes for fall, from general donations. Jordan drafts the posting."
+          ],
+          [
+            "MTG-0801",
+            "2026-08-01",
+            "ops",
+            "Coordinator posting still on for September per July meeting; Dee to share it with the library."
+          ],
+          [
+            "MTG-0805",
+            "2026-08-05",
+            "board",
+            "Donations 40% under plan. Coordinator hire is off for fall; revisit in January. Pull the posting."
+          ]
+        ],
+        "row_count": 3,
+        "latency_ms": 189
+      }
+    ]
+  }
+}

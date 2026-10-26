@@ -1,0 +1,201 @@
+{
+  "route": {
+    "tier": "super",
+    "reason": "default"
+  },
+  "egress": [
+    {
+      "id": "demo-007",
+      "chars": 100
+    },
+    {
+      "id": "demo-019",
+      "chars": 111
+    },
+    {
+      "id": "demo-023",
+      "chars": 137
+    },
+    {
+      "id": "demo-014",
+      "chars": 122
+    },
+    {
+      "id": "demo-012",
+      "chars": 114
+    },
+    {
+      "id": "demo-013",
+      "chars": 118
+    },
+    {
+      "id": "demo-004",
+      "chars": 126
+    },
+    {
+      "id": "demo-020",
+      "chars": 85
+    }
+  ],
+  "answer": "For the October\u202f15 county report you need:\n\n- **Devices distributed since July\u202f1:** 27\u202fdevices [zetaris:q-2e68aa63]  \n- **Class attendance since July\u202f1:** 72\u202fattendees across 16\u202fsessions [zetaris:q-46c5ea53]  \n- **Two participant quotes** (to be collected separately) [demo-019]\n\nThe first quarterly report (filed July\u202f14) covered 41 attendees and 12 devices [demo-014]; this second report covers the July\u2013September period. Remember the portal\u2019s 5\u202fMB file limit [demo-023].",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "usage": {
+    "prompt_tokens": 2642,
+    "completion_tokens": 578,
+    "latency_s": 19.794
+  },
+  "cost_usd": null,
+  "provider": "meterless",
+  "receipt_id": "rcpt_req_pvw2a2cp",
+  "hmem": {
+    "scores": {
+      "demo-007": 0.310156,
+      "demo-019": 0.302306,
+      "demo-023": 0.285386,
+      "demo-014": 0.250692,
+      "demo-012": 0.181377,
+      "demo-013": 0.17967,
+      "demo-004": 0.17393,
+      "demo-020": 0.121831
+    },
+    "retrievalReason": "8 of 8 memories at or above 0",
+    "ledger": {
+      "create": 8,
+      "read": 8
+    },
+    "superseded": {}
+  },
+  "memories": [
+    {
+      "id": "demo-007",
+      "date": "2026-05-01",
+      "wing": "grants",
+      "room": "decisions",
+      "text": "Promised the county we'd report quarterly: first report due July 15, then October 15 and January 15.",
+      "score": 5.798
+    },
+    {
+      "id": "demo-019",
+      "date": "2026-09-04",
+      "wing": "grants",
+      "room": "planning",
+      "text": "Next county report due October 15: need device counts, class attendance since July, and two participant quotes.",
+      "score": 4.855
+    },
+    {
+      "id": "demo-023",
+      "date": "2026-09-23",
+      "wing": "grants",
+      "room": "references",
+      "text": "County contact for the grant is the Digital Inclusion desk; reports go through the same portal as the application (watch the 5 MB limit).",
+      "score": 3.771
+    },
+    {
+      "id": "demo-014",
+      "date": "2026-07-14",
+      "wing": "grants",
+      "room": "sessions",
+      "text": "Filed the first quarterly report to the county one day early, with class counts (41 attendees) and 12 devices distributed.",
+      "score": 3.031
+    },
+    {
+      "id": "demo-012",
+      "date": "2026-06-30",
+      "wing": "grants",
+      "room": "sessions",
+      "text": "County grant awarded: $8,000, restricted to devices, hotspots and class materials. No staff wages from this money.",
+      "score": 1.104
+    },
+    {
+      "id": "demo-013",
+      "date": "2026-07-10",
+      "wing": "hub",
+      "room": "decisions",
+      "text": "Decided to hire a part-time coordinator in the fall, funded from general donations (the county grant can't pay wages).",
+      "score": 1.104
+    },
+    {
+      "id": "demo-004",
+      "date": "2026-03-28",
+      "wing": "grants",
+      "room": "problems",
+      "text": "County mini-grant portal rejected our PDF budget twice (file over 5 MB). Fixed by exporting at 150 dpi; submitted on March 29.",
+      "score": 0.967
+    },
+    {
+      "id": "demo-020",
+      "date": "2026-09-10",
+      "wing": "hub",
+      "room": "sessions",
+      "text": "Priya can't do Tuesdays in October; Dee offered to cover the first two repair nights.",
+      "score": 2.199
+    }
+  ],
+  "zetaris": {
+    "status": "ok",
+    "plan": [
+      {
+        "template": "attendance",
+        "params": {
+          "since": "2026-07-01"
+        },
+        "why": "class attendance since July 1, for the October report"
+      },
+      {
+        "template": "count_devices",
+        "params": {
+          "since": "2026-07-01"
+        },
+        "why": "devices handed out since July 1, for the October report"
+      }
+    ],
+    "egress": [
+      {
+        "id": "zetaris:q-46c5ea53",
+        "rows": 1,
+        "row_count": 1,
+        "chars": 239,
+        "latency_ms": 267
+      },
+      {
+        "id": "zetaris:q-2e68aa63",
+        "rows": 1,
+        "row_count": 1,
+        "chars": 198,
+        "latency_ms": 209
+      }
+    ],
+    "records": [
+      {
+        "id": "zetaris:q-46c5ea53",
+        "sql": "SELECT sum(attendees) AS attendees, count(*) AS sessions FROM PALACE_DEMO.class_sessions WHERE date >= '2026-07-01'",
+        "columns": [
+          "attendees",
+          "sessions"
+        ],
+        "rows": [
+          [
+            "72",
+            "16"
+          ]
+        ],
+        "row_count": 1,
+        "latency_ms": 267
+      },
+      {
+        "id": "zetaris:q-2e68aa63",
+        "sql": "SELECT count(*) AS devices FROM PALACE_DEMO.device_ledger WHERE handed_out >= '2026-07-01'",
+        "columns": [
+          "devices"
+        ],
+        "rows": [
+          [
+            "27"
+          ]
+        ],
+        "row_count": 1,
+        "latency_ms": 209
+      }
+    ]
+  }
+}
