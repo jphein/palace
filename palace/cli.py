@@ -19,18 +19,34 @@ def _client(cfg: Config):
 
 
 def cmd_ask(cfg: Config, args) -> int:
+    from .adapters.zetaris import Unreachable, ZetarisOffline, open_zetaris
     memory = open_memory(cfg)
     chat = None if args.dry_run else _client(cfg).chat
-    turn = run_turn(args.question, memory, chat, prices=cfg.prices)
+    try:
+        org = open_zetaris()
+    except ZetarisOffline as e:
+        org = Unreachable(e)
+    turn = run_turn(args.question, memory, chat, prices=cfg.prices, org=org)
     if args.json:
         print(json.dumps({"route": turn.route.__dict__, "egress": turn.egress, "answer": turn.answer, "model": turn.model,
                           "usage": turn.usage, "cost_usd": turn.cost_usd,
-                          "memories": [m.__dict__ for m in turn.memories]}, indent=2))
+                          "memories": [m.__dict__ for m in turn.memories],
+                          "zetaris": {"status": turn.org_status, "plan": [s.__dict__ for s in turn.plan],
+                                      "egress": turn.record_egress,
+                                      "records": [rs.__dict__ for rs in turn.records]}}, indent=2))
         return 0
     print(f"route: {turn.route.tier} ({turn.route.reason})")
-    print("what leaves the house: " + (", ".join(f"{e['id']} ({e['chars']} chars)" for e in turn.egress) or "nothing"))
+    sent = [f"{e['id']} ({e['chars']} chars)" for e in turn.egress]
+    sent += [f"{e['id']} ({e['rows']} rows, {e['chars']} chars)" for e in turn.record_egress]
+    print("what leaves the house: " + (", ".join(sent) or "nothing"))
     for m in turn.memories:
         print(f"  {m.cite()} {m.wing}/{m.room}: {m.text[:100]}")
+    if turn.org_status:
+        print(f"zetaris: {turn.org_status}")
+    for step, rs in zip(turn.plan, turn.records):
+        print(f"  {rs.cite()} {step.template}({', '.join(f'{k}={v!r}' for k, v in step.params.items())}) -> "
+              f"{rs.row_count} rows in {rs.latency_ms} ms: {' | '.join(rs.columns)} = "
+              + "; ".join(" | ".join(r) for r in rs.rows[:3]))
     if turn.answer:
         print("\n" + turn.answer)
         u = turn.usage or {}
@@ -106,6 +122,9 @@ def main(argv: list[str] | None = None) -> int:
     except ConfigError as e:
         print(f"palace: {e}", file=sys.stderr)
         return 2
+    except RuntimeError as e:  # ZetarisError: a refused login or query (an outage is reported in the turn)
+        print(f"palace: {e}", file=sys.stderr)
+        return 4
     except OSError as e:  # URLError, timeouts, refused connections
         print(f"palace: network error: {getattr(e, 'reason', e)}", file=sys.stderr)
         return 3

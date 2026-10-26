@@ -108,8 +108,8 @@ footer a { color: var(--muted); }
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const EXAMPLES = [
-    "When is the next county report due?",
-    "What did I decide about hiring a coordinator, and did it change?",
+    "What numbers go in the October county report?",
+    "Is the coordinator hire on?",
     "What should I check before accepting donated laptops?",
     "Who is covering repair nights in October?",
     "Plan my October: what do I owe, and to whom?",
@@ -130,7 +130,7 @@ footer a { color: var(--muted); }
     m.className = "badge " + s.mode;
     m.title = s.mode === "live" ? "Answers come from Nemotron on Nebius Token Factory"
       : "No NEBIUS_API_KEY: recall and routing run, and the panel shows exactly what would be sent. Nothing is sent.";
-    $("#mem").textContent = s.memory;
+    $("#mem").textContent = s.memory + (s.zetaris ? " · Zetaris " + s.zetaris : "");
   }).catch(() => { $("#mode").textContent = "offline"; });
 
   for (const q of EXAMPLES) {
@@ -154,11 +154,18 @@ footer a { color: var(--muted); }
     const e = t.egress, snip = e.snippets.reduce((a, s) => a + s.chars, 0);
     const mems = t.memories.map((m) => `<div class="mem" data-id="${esc(m.id)}"><b>[${esc(m.id)}${m.date ? ", " + esc(m.date) : ""}]</b>
       <span class="where">${esc(m.wing)}/${esc(m.room)} · score ${esc(m.score)}</span><br>${esc(m.text.slice(0, 600))}</div>`).join("");
+    const z = t.zetaris || { status: null, records: [] };
+    const recs = z.records.map((r) => `<div class="mem" data-id="${esc(r.id)}"><b>[${esc(r.id)}]</b>
+      <span class="where">Zetaris · ${esc(r.template)} · ${esc(r.row_count)} rows · ${esc(r.latency_ms)} ms</span><br>${esc(r.why)}
+      <pre>${esc(r.sql)}\n${esc(r.columns.join(" | "))}\n${r.rows.slice(0, 20).map((x) => esc(x.join(" | "))).join("\n")}</pre></div>`).join("");
+    const zline = z.status === "ok" ? `${z.records.length} record set(s) from Zetaris`
+      : z.status ? esc(z.status) : "not needed for this question";
     $("#egress").innerHTML = `
       <dl class="kv">
         <dt>Destination</dt><dd>${esc(e.destination)} ${e.sent ? "(sent)" : "<b>(not sent: preview)</b>"}</dd>
         <dt>Tier</dt><dd>Nemotron <b>${esc(t.route.tier)}</b>: ${esc(t.route.reason)}</dd>
         <dt>Model id</dt><dd><code>${esc(t.model || t.route.model)}</code></dd>
+        <dt>Org records</dt><dd>${zline}</dd>
       </dl>
       <div class="stat">
         <div><b>${e.snippets.length}</b><span>memories ${e.sent ? "sent" : "would be sent"}</span></div>
@@ -166,6 +173,7 @@ footer a { color: var(--muted); }
         <div><b>${e.total_chars}</b><span>characters in the whole prompt</span></div>
       </div>
       ${mems || '<p class="empty">No memories matched, so no memory text leaves the house.</p>'}
+      ${recs}
       <details><summary>Exact messages ${e.sent ? "sent" : "that would be sent"} to the model</summary><pre>${esc(JSON.stringify(e.messages, null, 2))}</pre></details>`;
   }
 
@@ -180,7 +188,9 @@ footer a { color: var(--muted); }
       let r = await post(false), t = await r.json(), capped = null;
       if (r.status === 429 && t.limit) { capped = t.error; r = await post(true); t = await r.json(); }
       if (!r.ok) throw new Error(t.error || r.status);
-      const meta = `Nemotron ${esc(t.route.tier)} · ${esc(t.route.reason)} · ${t.memories.length} memories`;
+      const nrec = (t.zetaris && t.zetaris.records.length) || 0;
+      const meta = `Nemotron ${esc(t.route.tier)} · ${esc(t.route.reason)} · ${t.memories.length} memories`
+        + (nrec ? ` · ${nrec} Zetaris record sets` : "");
       const body = t.answer ? `<div class="body">${withCites(t.answer)}</div>`
         : `<div class="note">${capped ? esc(capped) + " Showing a preview instead: nothing was sent." : "Preview mode: no model key is configured, so nothing was sent."} Recall and routing ran; see the panel for exactly what Nemotron would receive.</div>`;
       log.insertAdjacentHTML("beforeend", `<div class="a"><div class="meta">${meta}</div>${body}</div>`);

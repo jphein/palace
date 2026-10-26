@@ -20,7 +20,7 @@
     "files": ["docs/open-agent-design.md", "demo/zetaris/"]
   },
   "sponsors": {
-    "zetaris": {"where": "source of record for the organisation's records, over Zetaris REST", "status": "planned"},
+    "zetaris": {"where": "source of record for the organisation's records, over Zetaris REST", "status": "working"},
     "meterless": {
       "engines": ["H-MEM memory layer", "World Model event log"],
       "provider": "Nightshift as the primary AI provider",
