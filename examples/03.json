@@ -1,0 +1,135 @@
+{
+  "route": {
+    "tier": "super",
+    "reason": "default"
+  },
+  "egress": [
+    {
+      "id": "demo-016",
+      "chars": 112
+    },
+    {
+      "id": "demo-008",
+      "chars": 113
+    },
+    {
+      "id": "demo-013",
+      "chars": 118
+    }
+  ],
+  "answer": "Three donations have been rejected after failing the SMART check (tickets T\u20111011, T\u20111012, T\u20111033) [zetaris:q-402dc831].",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "usage": {
+    "prompt_tokens": 1670,
+    "completion_tokens": 184,
+    "latency_s": 3.026
+  },
+  "cost_usd": null,
+  "provider": "meterless",
+  "receipt_id": "rcpt_req_6uk7sw1k",
+  "hmem": {
+    "scores": {
+      "demo-016": 0.24563,
+      "demo-008": 0.13482,
+      "demo-013": 0.023655
+    },
+    "retrievalReason": "3 of 3 memories at or above 0; superseded and penalised: demo-013",
+    "ledger": {
+      "create": 3,
+      "update": 1,
+      "read": 3
+    },
+    "superseded": {
+      "demo-013": "demo-016"
+    }
+  },
+  "memories": [
+    {
+      "id": "demo-016",
+      "date": "2026-08-05",
+      "wing": "hub",
+      "room": "decisions",
+      "text": "Reversed the July decision: no coordinator hire this fall. Donations came in 40% under plan; revisit in January.",
+      "score": 2.357
+    },
+    {
+      "id": "demo-008",
+      "date": "2026-05-12",
+      "wing": "hub",
+      "room": "problems",
+      "text": "Two donated laptops had failing SSDs. Rule going forward: run a SMART check before accepting any donated machine.",
+      "score": 5.451
+    },
+    {
+      "id": "demo-013",
+      "date": "2026-07-10",
+      "wing": "hub",
+      "room": "decisions",
+      "text": "Decided to hire a part-time coordinator in the fall, funded from general donations (the county grant can't pay wages).",
+      "score": 2.357
+    }
+  ],
+  "zetaris": {
+    "status": "ok",
+    "plan": [
+      {
+        "template": "tickets",
+        "params": {
+          "status": "rejected (SMART fail)"
+        },
+        "why": "donations rejected by the SMART check"
+      }
+    ],
+    "egress": [
+      {
+        "id": "zetaris:q-402dc831",
+        "rows": 3,
+        "row_count": 3,
+        "chars": 530,
+        "latency_ms": 220
+      }
+    ],
+    "records": [
+      {
+        "id": "zetaris:q-402dc831",
+        "sql": "SELECT ticket, opened, device, donor, issue, status FROM PALACE_DEMO.tickets WHERE status = 'rejected (SMART fail)' ORDER BY ticket",
+        "columns": [
+          "ticket",
+          "opened",
+          "device",
+          "donor",
+          "issue",
+          "status"
+        ],
+        "rows": [
+          [
+            "T-1011",
+            "05/13/2026",
+            "laptop",
+            "a neighbour",
+            "intake check",
+            "rejected (SMART fail)"
+          ],
+          [
+            "T-1012",
+            "05/17/2026",
+            "desktop",
+            "St. Anne's parish",
+            "intake check",
+            "rejected (SMART fail)"
+          ],
+          [
+            "T-1033",
+            "08/09/2026",
+            "desktop",
+            "Pine Ridge Credit Union",
+            "intake check",
+            "rejected (SMART fail)"
+          ]
+        ],
+        "row_count": 3,
+        "latency_ms": 220
+      }
+    ]
+  }
+}

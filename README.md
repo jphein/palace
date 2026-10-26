@@ -136,6 +136,8 @@ This `public` branch is also the Open Agent Hackathon entry. The window opened o
 - The design's §1 table lists, line by line, what is pre-existing and what is built in the window. Its "As built" table says
   what was finished (Zetaris, Nightshift, H-MEM) and what wasn't (the Planner, the World Model).
 - [`FAILURES.md`](FAILURES.md) lists the failure modes we found while building, and which of them are still open.
+- [`examples/`](examples/) holds four live sample inputs and outputs (`palace ask --json`) and the H-MEM trust-ledger
+  trace they produced. [`.env.example`](.env.example) lists every setting, with placeholder values only.
 
 | Sponsor | Where it sits in Palace | Status |
 |---|---|---|
