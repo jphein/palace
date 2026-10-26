@@ -64,3 +64,12 @@ What broke or misled us, how we found it, and what we did. "Open" means it isn't
     test except the live Zetaris ones.
 17. **The web panel shows the provider's host name.** That's right for a user, but a screen recording would publish
     our home network's host names. The demo video reaches Zetaris and Nightshift through SSH tunnels on 127.0.0.1.
+
+## Found while recording the demo
+
+18. **Zetaris login tokens expire after 15 minutes**, and an expired token gets `400 {"msg": "Bad Request"}`, not
+    401. A long-running `palace serve` signed in once, and 20 minutes later every query failed. Palace said "Zetaris
+    refused the query" and gave no numbers, which was correct but useless. Found while recording the demo. Fix:
+    a client made by `login()` renews its token a minute before its `exp` claim, and once more if a query is still
+    refused. A client made from an API token can't renew, and the error says so. Tested on the double
+    (`expire_token()`) and on our running Zetaris.

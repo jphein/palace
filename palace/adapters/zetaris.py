@@ -17,6 +17,7 @@ test double's SQLite quote strings differently, so an allow-list is safer than e
 """
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import re
@@ -33,6 +34,7 @@ _VALUE = re.compile(r"[A-Za-z0-9 .:/()-]{1,80}")
 _DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 # A proxy in front of a stopped API answers with a gateway error: that is an outage, not a bad request.
 _OUTAGE = {502, 503, 504}
+REFRESH_EARLY_S = 60   # login tokens last 900 s on the participant bundle (measured 2026-10-26); renew a minute early
 
 
 class ZetarisError(RuntimeError):
@@ -42,6 +44,19 @@ class ZetarisError(RuntimeError):
 class ZetarisOffline(ZetarisError):
     def __init__(self, why: str):
         super().__init__(f"Zetaris: offline ({why})")
+
+
+class _TokenRefused(Exception):
+    pass
+
+
+def _token_exp(token: str) -> float | None:
+    """The `exp` claim of a JWT login token, or None (an API token, or anything else opaque)."""
+    try:
+        part = token.split(".")[1]
+        return float(json.loads(base64.urlsafe_b64decode(part + "=" * (-len(part) % 4)))["exp"])
+    except (IndexError, ValueError, KeyError, TypeError):
+        return None
 
 
 @dataclass(frozen=True)
@@ -72,6 +87,8 @@ def _date(v: str) -> str | None:
 class Zetaris:
     def __init__(self, base_url: str, token: str, org_id: str, timeout: float = 30.0):
         self.base, self.token, self.org_id, self.timeout = base_url.rstrip("/"), token, str(org_id), timeout
+        self._login: tuple[str, str] | None = None   # kept only for a client made by login(), to renew its token
+        self._exp = _token_exp(token)
 
     @classmethod
     def login(cls, base_url: str, email: str, password: str, timeout: float = 30.0) -> "Zetaris":
@@ -92,11 +109,33 @@ class Zetaris:
         org = body.get("orgId") or (body.get("user") or {}).get("orgId")
         if not token or org is None:
             raise ZetarisError("Zetaris login answered without a token or an org id")
-        return cls(base_url, token, str(org), timeout)
+        z = cls(base_url, token, str(org), timeout)
+        z._login = (email, password)
+        return z
+
+    def _renew(self) -> None:
+        fresh = Zetaris.login(self.base, *self._login, timeout=self.timeout)
+        self.token, self.org_id, self._exp = fresh.token, fresh.org_id, fresh._exp
 
     # --- the REST call ----------------------------------------------------------------------------
 
     def query(self, sql: str, limit: int = 100) -> RecordSet:
+        # A long-running `palace serve` outlives a 15-minute login token: renew it before it expires, and once more if
+        # Zetaris still refuses the token. The bundle answers an expired token with 400 {"msg": "Bad Request"}.
+        if self._login and self._exp and time.time() > self._exp - REFRESH_EARLY_S:
+            self._renew()
+        try:
+            return self._query(sql, limit)
+        except _TokenRefused:
+            if not self._login:
+                raise ZetarisError("Zetaris refused the token (expired or wrong); sign in again") from None
+            self._renew()
+            try:
+                return self._query(sql, limit)
+            except _TokenRefused:
+                raise ZetarisError("Zetaris refused a freshly signed-in token") from None
+
+    def _query(self, sql: str, limit: int) -> RecordSet:
         req = urllib.request.Request(self.base + QUERY_PATH, method="POST",
                                      data=json.dumps({"sql": sql, "limit": limit}).encode(),
                                      headers={"Content-Type": "application/json",
@@ -110,6 +149,8 @@ class Zetaris:
             detail = e.read()[:300].decode(errors="replace")
             if e.code in _OUTAGE:
                 raise ZetarisOffline(f"HTTP {e.code}") from None
+            if e.code in (401, 403) or (e.code == 400 and '"Bad Request"' in detail):
+                raise _TokenRefused() from None
             raise ZetarisError(f"Zetaris refused the query: HTTP {e.code} {detail}") from None
         except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
             raise ZetarisOffline(str(getattr(e, "reason", e))) from None

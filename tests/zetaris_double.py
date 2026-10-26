@@ -21,6 +21,8 @@ from pathlib import Path
 
 DATASET = Path(__file__).resolve().parent.parent / "demo" / "zetaris"
 QUERY_PATH = "/api/proxy/sql-editor/sqls/run-query"
+LOGIN_PATH = "/api/auth/login"
+USER = {"username": "demo@example.com", "password": "demo-password"}
 TABLES = ("decisions", "class_sessions", "tickets", "device_ledger")
 
 
@@ -47,12 +49,16 @@ class ZetarisDouble:
     """Start with `with ZetarisDouble() as z:`; `z.base_url`, `z.token`, `z.org_id`, and `z.requests` (what arrived)."""
 
     def __init__(self, token: str = "test-token", org_id: str = "1"):
-        self.token, self.org_id, self.requests = token, org_id, []
+        self.token, self.org_id, self.requests, self.logins = token, org_id, [], 0
         self.db = sqlite3.connect(":memory:", check_same_thread=False)
         self.lock = threading.Lock()
         load_dataset(self.db)
         self.httpd = ThreadingHTTPServer(("127.0.0.1", 0), self._handler())
         self.base_url = f"http://127.0.0.1:{self.httpd.server_address[1]}"
+
+    def expire_token(self) -> None:
+        """Simulate the 15-minute expiry: the current token stops working, and the next login issues a new one."""
+        self.token = f"token-{uuid.uuid4().hex[:8]}"
 
     def __enter__(self):
         threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
@@ -80,10 +86,15 @@ class ZetarisDouble:
             def do_POST(self):
                 body = json.loads(self.rfile.read(int(self.headers.get("content-length") or 0)) or b"{}")
                 double.requests.append({"path": self.path, "headers": dict(self.headers), "body": body})
+                if self.path == LOGIN_PATH:
+                    if body != USER:
+                        return self._send(401, {"error": "bad credentials"})
+                    double.logins += 1
+                    return self._send(200, {"idToken": double.token, "orgId": int(double.org_id)})
                 if self.path != QUERY_PATH:
                     return self._send(404, {"error": "not found"})
                 if self.headers.get("authorization") != f"Bearer {double.token}":
-                    return self._send(401, {"error": "unauthorized"})
+                    return self._send(400, {"msg": "Bad Request"})   # what the real bundle answers an expired token
                 if self.headers.get("x-org-id") != double.org_id:
                     return self._send(403, {"error": "wrong org"})
                 try:
