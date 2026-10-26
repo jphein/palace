@@ -133,14 +133,16 @@ This `public` branch is also the Open Agent Hackathon entry. The window opened o
   and the Token Factory client.
 - **Declared pre-window prep**, written on 2026-10-19 and committed in the window's first commit:
   [`docs/open-agent-design.md`](docs/open-agent-design.md) and the synthetic dataset in [`demo/zetaris/`](demo/zetaris/).
-- The design's §1 table lists, line by line, what is pre-existing and what is built in the window.
+- The design's §1 table lists, line by line, what is pre-existing and what is built in the window. Its "As built" table says
+  what was finished (Zetaris, Nightshift, H-MEM) and what wasn't (the Planner, the World Model).
+- [`FAILURES.md`](FAILURES.md) lists the failure modes we found while building, and which of them are still open.
 
 | Sponsor | Where it sits in Palace | Status |
 |---|---|---|
 | **Zetaris** | The source of record: the organisation's decisions, tickets and ledgers, queried over Zetaris REST next to the personal memory | **working** (adapter, query templates, live tests against our Zetaris) |
 | **Meterless** | The H-MEM memory layer (provenance, confidence, supersession, trust ledger) in every turn; **Nightshift** as the primary AI provider | H-MEM **working** (conformance vectors green); Nightshift provider **working**; World Model not built |
 | **NVIDIA** | Nemotron answers each turn: Nemotron 3.5 Lightning and Nemotron 3 Ultra via Nightshift's NVIDIA provider, or Nemotron 3 Nano / Super / Ultra via Nebius Token Factory | **working** on both |
-| **Cursor** | Used for part of the window's code (HackOS made Cursor optional on 22 Oct); prompts and session logs go in `docs/cursor-evidence/` | signed in; first session pending |
+| **Cursor** | Optional since HackOS's 22 Oct change. The window's code was written with Claude Code, not Cursor | not used |
 
 **Grounded in Zetaris.** Every fact in an answer comes from a cited Zetaris record or a cited memory, so each answer
 traces back to the data it rests on. Palace does no web search. If the optional web search on the roadmap (item 5) is
