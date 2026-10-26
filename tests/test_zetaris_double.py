@@ -38,7 +38,8 @@ def test_select_1_has_the_shape_the_real_endpoint_returned(z):
     assert code == 200 and body["data"] == [["1"]] and body["total"] == 1     # real Zetaris: [["1"]] (pre-window check)
 
 
-@pytest.mark.parametrize("kw,code", [({"token": "wrong"}, 401), ({"org": "2"}, 403), ({"request_id": "not-a-uuid"}, 400)])
+@pytest.mark.parametrize("kw,code", [({"token": "wrong"}, 400),   # the real bundle: 400 {"msg": "Bad Request"}
+                                      ({"org": "2"}, 403), ({"request_id": "not-a-uuid"}, 400)])
 def test_auth_headers_are_enforced(z, kw, code):
     assert _run(z, "SELECT 1", **kw)[0] == code
 

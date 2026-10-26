@@ -130,3 +130,29 @@ def test_template_parameters_are_values_not_sql(z, evil):
 def test_template_sql_is_recorded_on_the_record_set(z):
     rs = z.count_devices(since="2026-07-01")
     assert re.search(r"device_ledger", rs.sql) and rs.id.startswith("zetaris:q-")
+
+
+# --- login tokens expire (15 minutes on the participant bundle) -----------------------------------------
+
+def test_a_login_client_renews_an_expired_token(double):
+    from zetaris_double import USER
+    z = zetaris.Zetaris.login(double.base_url, USER["username"], USER["password"], timeout=5)
+    assert z.query("SELECT 1").rows == [["1"]] and double.logins == 1
+    double.expire_token()
+    assert z.query("SELECT 1").rows == [["1"]], "an expired token is renewed, not reported as a failed query"
+    assert double.logins == 2
+
+
+def test_a_token_client_cannot_renew_and_says_why(double):
+    z = zetaris.Zetaris(base_url=double.base_url, token=double.token, org_id=double.org_id, timeout=5)
+    double.expire_token()
+    with pytest.raises(zetaris.ZetarisError, match="refused the token"):
+        z.query("SELECT 1")
+
+
+def test_renews_before_the_exp_claim(double, monkeypatch):
+    from zetaris_double import USER
+    z = zetaris.Zetaris.login(double.base_url, USER["username"], USER["password"], timeout=5)
+    z._exp = 1.0   # long past
+    z.query("SELECT 1")
+    assert double.logins == 2, "a token past its exp is renewed before the query is sent"
