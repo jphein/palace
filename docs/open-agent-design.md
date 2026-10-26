@@ -23,6 +23,18 @@ the README and in `metadata.json`.
 | Live eval (2026-10-19): expected-cited 0.958, citation valid 1.0, abstain 1.0; keyword router tier accuracy **0.731**, the "before" for the planner | **JSONL evidence log** of every Zetaris, Nightshift/Nemotron and engine call; eval extension; FAILURES.md |
 | **Declared pre-window prep** (written 2026-10-19, committed in the window): this design document, plus the synthetic Zetaris dataset (`demo/zetaris/`: 5 tables, `ground_truth.json`) and its generator | |
 
+**As built, 26 Oct 2026** (each merged on `public` after tests, a perturbation that went red, and a secret scan):
+
+| Window item | Status | Where |
+|---|---|---|
+| Zetaris adapter, query templates, live tests, dataset loader | **built** | jphein/palace#10 (`5d4be0e`): `palace/adapters/zetaris.py`, `palace/orgplan.py` |
+| Meterless Nightshift provider (primary), Nemotron pinned per tier, receipts | **built** | #11 (`3e4b1f1`): `palace/providers/meterless.py` |
+| H-MEM memory layer in every turn, conformance vectors ported (13/13), trust ledger | **built** | #12 (`4adfef0`): `palace/engines/hmem.py` |
+| FAILURES.md, test-env isolation | **built** | this table's PR |
+| Planner replacing the keyword router | **not built**: `palace/orgplan.py` picks Zetaris templates by rule; the tier router is still the pre-existing one (0.731) | |
+| World Model event log | **not built** | |
+| JSONL evidence log of every call; eval extension | **partly**: the H-MEM trust ledger (`PALACE_TRUST_LEDGER`) and per-answer receipts; no eval extension | |
+
 No Zetaris or Meterless code existed before the window. The dataset, its generator and this document were
 written before the window and are declared as prep, not presented as window work.
 
@@ -183,6 +195,9 @@ No headers, keys or bearer tokens are ever logged. Endpoints are logged as paths
 
 ## 7. Cursor
 
+> **Update, 26 Oct 2026.** Cursor was not used in the end: the adapter, the Nightshift provider and H-MEM
+> were written with Claude Code, which the 22 Oct change allows. The plan below is kept as written.
+>
 > **Update, 23 Oct 2026 (in the window).** On 22 Oct the organisers made Cursor optional ("any AI coding tool …
 > Cursor, Claude Code, Windsurf or GitHub Copilot"), and no Cursor credits come with the event. Palace still uses
 > Cursor for part of the window's code, on its free plan, and keeps the evidence as described below. The rest is

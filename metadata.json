@@ -31,6 +31,6 @@
       "via": ["Nebius Token Factory (pre-existing)", "Meterless Nightshift's NVIDIA provider (window work)"],
       "status": "working"
     },
-    "cursor": {"where": "used for part of the window's code (optional since the organisers' 2026-10-22 change); evidence in docs/cursor-evidence/", "status": "signed in; first session pending"}
+    "cursor": {"where": "optional since the organisers' 2026-10-22 change; the window's code was written with Claude Code", "status": "not used"}
   }
 }
