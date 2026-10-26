@@ -96,6 +96,15 @@ DEFAULT_MODELS = {
     "super": "nvidia/nemotron-3-super-120b-a12b",     # default
     "ultra": "nvidia/Nemotron-3-Ultra-550b-a55b",     # serious reasoning, used sparingly
 }
+# Meterless Nightshift: one explicit NVIDIA Nemotron id per tier (measured through our Nightshift 2026-10-26).
+# Nemotron 3 Super 120B answers 404 for our NVIDIA account, and the meterless/fast and /deep lanes routed to
+# Ultra in 13-14 s against 1.6 s for Ultra asked directly, so super and ultra both pin Ultra.
+DEFAULT_METERLESS_MODELS = {
+    "nano": "nvidia/nemotron-3.5-lightning-30b-a3b",
+    "super": "nvidia/nemotron-3-ultra-550b-a55b",
+    "ultra": "nvidia/nemotron-3-ultra-550b-a55b",
+}
+PROVIDERS = ("meterless", "tokenfactory")
 # USD per 1M tokens (input, output), per tier. Override with PALACE_PRICE_<TIER>="in,out".
 DEFAULT_PRICES = {"nano": (0.06, 0.24), "super": (0.30, 0.90), "ultra": (1.00, 3.00)}
 
@@ -124,10 +133,27 @@ class Config:
     forbidden_hosts: frozenset[str] = field(default_factory=frozenset)
     allowed_hosts: frozenset[str] = field(default_factory=frozenset)
     prices: dict[str, tuple[float, float]] = field(default_factory=lambda: dict(DEFAULT_PRICES))
+    provider: str = "tokenfactory"     # "meterless" (Nightshift) when METERLESS_BASE_URL is set, unless PALACE_PROVIDER says
+    meterless_url: str | None = None
+    meterless_key: str | None = None
+    meterless_models: dict[str, str] = field(default_factory=lambda: dict(DEFAULT_METERLESS_MODELS))
+
+    @property
+    def active_models(self) -> dict[str, str]:
+        return self.meterless_models if self.provider == "meterless" else self.models
+
+    @property
+    def model_host(self) -> str | None:
+        return urlparse(self.meterless_url if self.provider == "meterless" else self.base_url).hostname
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] | None = None, host_files: Iterable[Path] | None = None) -> "Config":
         e = os.environ if env is None else env
+        from .providers.meterless import normalise_base_url
+        m_url = normalise_base_url(e["METERLESS_BASE_URL"]) if e.get("METERLESS_BASE_URL") else None
+        provider = (e.get("PALACE_PROVIDER") or ("meterless" if m_url else "tokenfactory")).lower()
+        if provider not in PROVIDERS:
+            raise ConfigError(f"PALACE_PROVIDER {provider!r} must be one of {', '.join(PROVIDERS)}")
         cfg = cls(
             api_key=e.get("NEBIUS_API_KEY") or None,
             base_url=e.get("NEBIUS_BASE_URL", DEFAULT_BASE_URL),
@@ -137,6 +163,11 @@ class Config:
             forbidden_hosts=forbidden_hosts_from(e, host_files),
             allowed_hosts=frozenset(_split(e.get("PALACE_ALLOW_HOSTS", ""))),
             prices={tier: _price(e.get(f"PALACE_PRICE_{tier.upper()}"), default) for tier, default in DEFAULT_PRICES.items()},
+            provider=provider,
+            meterless_url=m_url,
+            meterless_key=e.get("METERLESS_API_KEY") or e.get("METERLESS_RUNTIME_TOKEN") or None,
+            meterless_models={tier: e.get(f"METERLESS_MODEL_{tier.upper()}", default)
+                              for tier, default in DEFAULT_METERLESS_MODELS.items()},
         )
         cfg.check_palace_url()
         return cfg

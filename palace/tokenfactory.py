@@ -16,9 +16,13 @@ class Completion:
     prompt_tokens: int | None
     completion_tokens: int | None
     latency_s: float | None = None
+    receipt_id: str | None = None    # the provider's own record of the call (Meterless compute receipt)
+    provider: str = "tokenfactory"
 
 
 class TokenFactory:
+    name = "tokenfactory"
+
     def __init__(self, cfg: Config, timeout: float = 120.0):
         if not cfg.api_key:
             raise ConfigError("NEBIUS_API_KEY is not set (create it in the Token Factory console; store it in the vault).")

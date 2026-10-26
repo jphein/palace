@@ -81,7 +81,7 @@ footer a { color: var(--muted); }
 <header>
   <img src="/favicon.svg" alt="">
   <h1>Palace</h1>
-  <span class="tag">your memory stays home · Nemotron on Nebius Token Factory</span>
+  <span class="tag" id="tag">your memory stays home · Nemotron via Meterless Nightshift or Nebius Token Factory</span>
   <span class="sp"></span>
   <span id="mode" class="badge">…</span>
   <span id="mem" class="badge">…</span>
@@ -126,10 +126,11 @@ footer a { color: var(--muted); }
 
   fetch("/api/status").then((r) => r.json()).then((s) => {
     const m = $("#mode");
-    m.textContent = s.mode === "live" ? "live · Token Factory" : "preview · no model key";
+    const via = s.provider === "meterless" ? "Meterless Nightshift" : "Token Factory";
+    m.textContent = s.mode === "live" ? "live · " + via : "preview · no model key";
     m.className = "badge " + s.mode;
-    m.title = s.mode === "live" ? "Answers come from Nemotron on Nebius Token Factory"
-      : "No NEBIUS_API_KEY: recall and routing run, and the panel shows exactly what would be sent. Nothing is sent.";
+    m.title = s.mode === "live" ? "Answers come from NVIDIA Nemotron via " + via
+      : "No model key: recall and routing run, and the panel shows exactly what would be sent. Nothing is sent.";
     $("#mem").textContent = s.memory + (s.zetaris ? " · Zetaris " + s.zetaris : "");
   }).catch(() => { $("#mode").textContent = "offline"; });
 
@@ -164,7 +165,8 @@ footer a { color: var(--muted); }
       <dl class="kv">
         <dt>Destination</dt><dd>${esc(e.destination)} ${e.sent ? "(sent)" : "<b>(not sent: preview)</b>"}</dd>
         <dt>Tier</dt><dd>Nemotron <b>${esc(t.route.tier)}</b>: ${esc(t.route.reason)}</dd>
-        <dt>Model id</dt><dd><code>${esc(t.model || t.route.model)}</code></dd>
+        <dt>Model id</dt><dd><code>${esc(t.model || t.route.model)}</code>${t.provider === "meterless" ? " via Meterless Nightshift" : ""}</dd>
+        ${t.receipt_id ? `<dt>Receipt</dt><dd><code>${esc(t.receipt_id)}</code> (Nightshift compute receipt)</dd>` : ""}
         <dt>Org records</dt><dd>${zline}</dd>
       </dl>
       <div class="stat">

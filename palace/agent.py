@@ -48,6 +48,8 @@ class Turn:
     records: list = field(default_factory=list)              # RecordSets returned by Zetaris
     record_egress: list[dict] = field(default_factory=list)  # what of them went to the model
     org_status: str | None = None    # None: no records needed; "ok"; or "Zetaris: offline (...)" / an error
+    provider: str | None = None      # "meterless" (Nightshift) or "tokenfactory"
+    receipt_id: str | None = None    # Nightshift's compute receipt for the model call
 
 
 def render_record(rs, why: str = "") -> str:
@@ -112,5 +114,8 @@ def run_turn(question: str, memory: MemoryBackend, chat: Callable[[str, list[dic
         c = chat(r.tier, prompt)
         turn.answer, turn.model = normalise_answer(c.text), c.model
         turn.usage = {"prompt_tokens": c.prompt_tokens, "completion_tokens": c.completion_tokens, "latency_s": c.latency_s}
-        turn.cost_usd = cost(r.tier, c.prompt_tokens, c.completion_tokens, prices)
+        turn.provider, turn.receipt_id = c.provider, c.receipt_id
+        # Token Factory bills per token at the tier's price. Nightshift's NVIDIA calls are metered by Nightshift
+        # (its receipt), not by Palace's price table, so Palace states no cost for them.
+        turn.cost_usd = None if c.provider == "meterless" else cost(r.tier, c.prompt_tokens, c.completion_tokens, prices)
     return turn

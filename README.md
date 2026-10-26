@@ -31,6 +31,8 @@ NEBIUS_API_KEY=... python3 -m palace models            # check the tier ids agai
 NEBIUS_API_KEY=... python3 -m palace ask "Should I still plan on hiring a coordinator?"
 NEBIUS_API_KEY=... python3 -m palace eval --live       # also: citation validity, abstention, tokens, cost
 python3 -m palace serve                                # web chat on http://127.0.0.1:8765/
+# Meterless Nightshift as the provider (primary when METERLESS_BASE_URL is set; Nemotron via its NVIDIA provider):
+METERLESS_BASE_URL=http://127.0.0.1:8088 METERLESS_API_KEY=... python3 -m palace models
 # with Zetaris (the organisation's records; load them once with demo/zetaris/load_zetaris.py):
 ZETARIS_BASE_URL=http://localhost:3000 ZETARIS_EMAIL=... ZETARIS_PASSWORD=... \
   NEBIUS_API_KEY=... python3 -m palace ask "What numbers go in the October county report?"
@@ -45,6 +47,10 @@ ZETARIS_BASE_URL=http://localhost:3000 ZETARIS_EMAIL=... ZETARIS_PASSWORD=... \
 | `PALACE_MODEL_NANO/SUPER/ULTRA` | Model ids per tier (defaults verified in the live catalog 2026-10-19; `palace models` re-checks) |
 | `PALACE_PRICE_NANO/SUPER/ULTRA` | `"input,output"` USD per 1M tokens, for the per-answer cost (defaults in `config.py`) |
 | `PALACE_URL`, `PALACE_API_KEY` | A **demo** palace-daemon; omit to use the offline synthetic palace |
+| `METERLESS_BASE_URL` | Meterless Nightshift's runtime URL (normalised to `…/v1`). When set, Nightshift is the provider |
+| `METERLESS_API_KEY` | Nightshift's runtime token (or `METERLESS_RUNTIME_TOKEN`); the `rt-local` placeholder is refused |
+| `METERLESS_MODEL_NANO/SUPER/ULTRA` | The NVIDIA Nemotron id pinned per tier (defaults in `config.py`; `palace models` checks them) |
+| `PALACE_PROVIDER` | `meterless` or `tokenfactory`, to override the choice above |
 | `ZETARIS_BASE_URL` | The Zetaris UI proxy origin, e.g. `http://localhost:3000`; omit to answer from memory alone |
 | `ZETARIS_EMAIL`, `ZETARIS_PASSWORD` | A Zetaris login (the token and org id come from the login response); or `ZETARIS_TOKEN` + `ZETARIS_ORG_ID` |
 | `PALACE_FORBIDDEN_HOSTS` | Comma-separated hosts that serve a **real** palace (added to the files below); subdomains are covered too |
@@ -105,7 +111,13 @@ question (`palace/orgplan.py`), run them on Zetaris (`palace/adapters/zetaris.py
 Nemotron next to the memories. Each record set is cited as `[zetaris:q-…]` and listed in the egress record. A
 live run answers "What numbers go in the October county report?" with 72 attendees and 27 devices, which match
 `demo/zetaris/ground_truth.json`. If Zetaris is offline the answer says so and gives no numbers. Still in progress:
-the stale-note judgement (MTG-0801 isn't flagged yet) and the Meterless engines.
+the Meterless engines.
+
+Meterless Nightshift is the primary provider when it's configured (`palace/providers/meterless.py`). Each tier is
+pinned to an NVIDIA Nemotron model, and each answer shows the model that actually ran plus Nightshift's compute
+receipt id. A live run on 26 Oct answered the coordinator question on Nemotron 3 Ultra 550B through Nightshift. It
+named the active decision, DEC-2026-008, and flagged the Aug 1 note MTG-0801 as out of date (receipt
+`rcpt_req_hhn1rrhj`). Token Factory stays selectable with `PALACE_PROVIDER=tokenfactory`.
 
 This `public` branch is also the Open Agent Hackathon entry. The window opened on 22 Oct 2026 at 00:00 UTC.
 - **Everything committed before that is pre-existing**: recall, the keyword router, the egress log, the web chat
@@ -117,8 +129,8 @@ This `public` branch is also the Open Agent Hackathon entry. The window opened o
 | Sponsor | Where it sits in Palace | Status |
 |---|---|---|
 | **Zetaris** | The source of record: the organisation's decisions, tickets and ledgers, queried over Zetaris REST next to the personal memory | **working** (adapter, query templates, live tests against our Zetaris) |
-| **Meterless** | The H-MEM memory layer (provenance, confidence, supersession) and the World Model event log; **Nightshift** as the primary AI provider | planned (window work) |
-| **NVIDIA** | Nemotron 3 Nano / Super / Ultra answers each turn, via Nightshift lanes and Nebius Token Factory | Token Factory is pre-existing; Nightshift lanes are planned |
+| **Meterless** | The H-MEM memory layer (provenance, confidence, supersession) and the World Model event log; **Nightshift** as the primary AI provider | Nightshift provider **working**; engines in progress |
+| **NVIDIA** | Nemotron answers each turn: Nemotron 3.5 Lightning and Nemotron 3 Ultra via Nightshift's NVIDIA provider, or Nemotron 3 Nano / Super / Ultra via Nebius Token Factory | **working** on both |
 | **Cursor** | Used for part of the window's code (HackOS made Cursor optional on 22 Oct); prompts and session logs go in `docs/cursor-evidence/` | signed in; first session pending |
 
 **Grounded in Zetaris.** Every fact in an answer comes from a cited Zetaris record or a cited memory, so each answer
@@ -132,7 +144,8 @@ added, its results will be context only, never the cited source of a fact.
   `tests/test_zetaris_live.py` checks the templates against them on the real engine.
 - **Meterless Nightshift** 1.2.3 runs in a Windows 10 VM on another local machine. Its OpenAI-compatible API answers
   from the dev machine: `GET /v1/models` lists the `meterless/*` routes, and a call without the runtime token gets 401.
-  NVIDIA goes into Nightshift's Providers tab next. Palace's provider integration is window work.
+  NVIDIA is connected in Nightshift's Providers tab (the key lives in Nightshift, never in Palace), and Palace calls
+  Nightshift as its provider.
 - Both will be running for the demo recording and during judging. Between development sessions their machines sleep
   to save power.
 
@@ -140,6 +153,11 @@ added, its results will be context only, never the cited source of a fact.
 - On a fresh Windows 10, Nightshift 1.2.3's `meterlessd.exe` won't start without the Microsoft Visual C++ runtime
   (`VCRUNTIME140.dll`), which its installer doesn't include. It exits with 0xC0000135. Installing Microsoft's
   `vc_redist.x64.exe` first fixes it.
+- Through Nightshift's NVIDIA provider, Nemotron 3 Super 120B returns NVIDIA 404 ("function not found for account")
+  for our key, so Palace's `super` tier pins Nemotron 3 Ultra. The `meterless/fast` and `meterless/deep` lanes
+  routed to Ultra in 13–14 s, against 1.6 s for Ultra requested directly, so Palace pins model ids rather than lanes.
+- Nemotron's reasoning sometimes arrives inline (a `…</think>` tail) through Nightshift. Palace strips it before
+  showing the answer.
 
 [`metadata.json`](metadata.json) holds the same information in machine-readable form. Its statuses are updated
 with each commit.
