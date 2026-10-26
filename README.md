@@ -50,6 +50,7 @@ ZETARIS_BASE_URL=http://localhost:3000 ZETARIS_EMAIL=... ZETARIS_PASSWORD=... \
 | `METERLESS_BASE_URL` | Meterless Nightshift's runtime URL (normalised to `…/v1`). When set, Nightshift is the provider |
 | `METERLESS_API_KEY` | Nightshift's runtime token (or `METERLESS_RUNTIME_TOKEN`); the `rt-local` placeholder is refused |
 | `METERLESS_MODEL_NANO/SUPER/ULTRA` | The NVIDIA Nemotron id pinned per tier (defaults in `config.py`; `palace models` checks them) |
+| `PALACE_TRUST_LEDGER` | Append H-MEM's trust ledger (JSONL) to this file; unset keeps it in memory only |
 | `PALACE_PROVIDER` | `meterless` or `tokenfactory`, to override the choice above |
 | `ZETARIS_BASE_URL` | The Zetaris UI proxy origin, e.g. `http://localhost:3000`; omit to answer from memory alone |
 | `ZETARIS_EMAIL`, `ZETARIS_PASSWORD` | A Zetaris login (the token and org id come from the login response); or `ZETARIS_TOKEN` + `ZETARIS_ORG_ID` |
@@ -110,8 +111,16 @@ Status (26 Oct): Zetaris works end to end. `palace ask` and the web chat pick re
 question (`palace/orgplan.py`), run them on Zetaris (`palace/adapters/zetaris.py`), and send the record sets to
 Nemotron next to the memories. Each record set is cited as `[zetaris:q-…]` and listed in the egress record. A
 live run answers "What numbers go in the October county report?" with 72 attendees and 27 devices, which match
-`demo/zetaris/ground_truth.json`. If Zetaris is offline the answer says so and gives no numbers. Still in progress:
-the Meterless engines.
+`demo/zetaris/ground_truth.json`. If Zetaris is offline the answer says so and gives no numbers.
+
+**Meterless H-MEM** (`palace/engines/hmem.py`) is implemented in Python from Meterless's open spec (`engines/hmem/AGENTS.md`)
+and runs in every turn. The recalled memories become H-MEM records with a source and date. Enrichment links
+supersession (Aug 5 "Reversed the July decision…" supersedes the Jul 10 decision), and the spec's hybrid score
+(including the −0.20 superseded penalty) orders them. Superseded memories are still sent, labelled
+`[SUPERSEDED by …]`, and every change goes to an append-only trust ledger (`PALACE_TRUST_LEDGER=path.jsonl`). The
+spec's conformance vectors are ported to pytest (`tests/test_hmem_conformance.py`, 13/13 green). That is "vectors
+ported", not the official TypeScript runner. Not implemented: LLM mining and chat scoping. The World Model engine
+is not built.
 
 Meterless Nightshift is the primary provider when it's configured (`palace/providers/meterless.py`). Each tier is
 pinned to an NVIDIA Nemotron model, and each answer shows the model that actually ran plus Nightshift's compute
@@ -129,7 +138,7 @@ This `public` branch is also the Open Agent Hackathon entry. The window opened o
 | Sponsor | Where it sits in Palace | Status |
 |---|---|---|
 | **Zetaris** | The source of record: the organisation's decisions, tickets and ledgers, queried over Zetaris REST next to the personal memory | **working** (adapter, query templates, live tests against our Zetaris) |
-| **Meterless** | The H-MEM memory layer (provenance, confidence, supersession) and the World Model event log; **Nightshift** as the primary AI provider | Nightshift provider **working**; engines in progress |
+| **Meterless** | The H-MEM memory layer (provenance, confidence, supersession, trust ledger) in every turn; **Nightshift** as the primary AI provider | H-MEM **working** (conformance vectors green); Nightshift provider **working**; World Model not built |
 | **NVIDIA** | Nemotron answers each turn: Nemotron 3.5 Lightning and Nemotron 3 Ultra via Nightshift's NVIDIA provider, or Nemotron 3 Nano / Super / Ultra via Nebius Token Factory | **working** on both |
 | **Cursor** | Used for part of the window's code (HackOS made Cursor optional on 22 Oct); prompts and session logs go in `docs/cursor-evidence/` | signed in; first session pending |
 

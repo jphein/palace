@@ -24,7 +24,7 @@
     "meterless": {
       "engines": ["H-MEM memory layer", "World Model event log"],
       "provider": "Nightshift as the primary AI provider",
-      "status": "provider working; engines in progress"
+      "status": "H-MEM and the Nightshift provider working; World Model not built"
     },
     "nvidia": {
       "where": "Nemotron 3 Nano / Super / Ultra answer each turn",

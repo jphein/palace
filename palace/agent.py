@@ -5,6 +5,7 @@ sent to the model for this answer. The memory store itself never leaves the user
 Hermes Agent integration (tools + persona) wraps this same turn; see README "Roadmap"."""
 from __future__ import annotations
 
+import datetime
 import re
 from dataclasses import dataclass, field
 from typing import Callable
@@ -19,7 +20,8 @@ SYSTEM = """You are Palace, a private personal assistant with access to the user
 Answer ONLY from the numbered memories and the organisation records provided. Cite every claim with its bracketed
 id: a memory as [demo-004], a record set as [zetaris:q-1a2b3c4d] (never a row's own id, such as MTG-0801). The
 organisation records (from Zetaris) are the source of record for counts and decisions: if a memory or a meeting note
-disagrees with the active entry in the decision log, name that note or memory as out of date. If neither contains the answer, say so plainly and suggest what to ask instead.
+disagrees with the active entry in the decision log, name that note or memory as out of date.
+A memory marked [SUPERSEDED by …] was replaced by the later one; answer from the later one and say what changed. If neither contains the answer, say so plainly and suggest what to ask instead.
 Be brief and warm."""
 
 MAX_SNIPPET = 600
@@ -50,6 +52,8 @@ class Turn:
     org_status: str | None = None    # None: no records needed; "ok"; or "Zetaris: offline (...)" / an error
     provider: str | None = None      # "meterless" (Nightshift) or "tokenfactory"
     receipt_id: str | None = None    # Nightshift's compute receipt for the model call
+    superseded: dict[str, str] = field(default_factory=dict)   # H-MEM: memory id -> the id that supersedes it
+    hmem: dict | None = None         # H-MEM trace: scores, retrievalReason, ledger counts
 
 
 def render_record(rs, why: str = "") -> str:
@@ -59,9 +63,41 @@ def render_record(rs, why: str = "") -> str:
     return "\n".join([head, *body] + ([f"  (+{more} more rows not shown)"] if more > 0 else []))
 
 
+def _ms(date: str | None) -> int | None:
+    try:
+        return int(datetime.datetime.fromisoformat(date).replace(tzinfo=datetime.timezone.utc).timestamp() * 1000)
+    except (TypeError, ValueError):
+        return None
+
+
+def hmem_rank(question: str, memories: list[Memory], ledger_path=None) -> tuple[list[Memory], dict, dict]:
+    """Meterless H-MEM over the recalled memories (palace/engines/hmem.py): each becomes an H-MEM record with its
+    source and date, enrichment links supersession ("Reversed the July decision…" supersedes the July decision),
+    and the hybrid score (with the -0.20 superseded penalty) orders them. Nothing is dropped: a superseded memory
+    is still sent, ranked lower and labelled, so the model can say what changed."""
+    from .engines.hmem import HMEM
+    if not memories:
+        return memories, {}, {"scores": {}, "retrievalReason": "no memories", "ledger": {}}
+    dated = [t for t in (_ms(m.date) for m in memories) if t is not None]
+    now = max(dated) if dated else None
+    h = HMEM(clock=(lambda: now) if now else None, ledger_path=ledger_path)
+    for m in memories:
+        h.add(content=m.text, source=f"palace:{m.wing}/{m.room}", id=m.id, timestamp=_ms(m.date),
+              tags=[m.wing, m.room], layer="long_term", confidence=0.8, label=f"palace memory {m.id}")
+    h.link_supersession()
+    res = h.query(question, threshold=0, topN=len(memories))
+    order = {x.memory.id: i for i, x in enumerate(res.memories)}
+    ranked = sorted(memories, key=lambda m: order.get(m.id, len(order)))
+    superseded = {r.id: r.supersededBy for r in h.store.all() if r.supersededBy}
+    return ranked, superseded, {"scores": {x.memory.id: x.score for x in res.memories},
+                                "retrievalReason": res.retrievalReason, "ledger": h.ledger.stats()}
+
+
 def build_prompt(question: str, memories: list[Memory], records: list[str] | None = None,
-                 org_status: str | None = None) -> list[dict]:
-    lines = [f"{m.cite()} ({m.wing}/{m.room}) {m.text[:MAX_SNIPPET]}" for m in memories]
+                 org_status: str | None = None, superseded: dict[str, str] | None = None) -> list[dict]:
+    sup = superseded or {}
+    lines = [f"{m.cite()} ({m.wing}/{m.room}){f' [SUPERSEDED by {sup[m.id]}]' if m.id in sup else ''} "
+             f"{m.text[:MAX_SNIPPET]}" for m in memories]
     context = "\n".join(lines) if lines else "(no relevant memories found)"
     user = f"Memories:\n{context}"
     if records:
@@ -96,18 +132,19 @@ def cost(tier: str, prompt_tokens: int | None, completion_tokens: int | None,
 
 
 def run_turn(question: str, memory: MemoryBackend, chat: Callable[[str, list[dict]], Completion] | None,
-             limit: int = 8, prices: dict[str, tuple[float, float]] = DEFAULT_PRICES, org=None) -> Turn:
+             limit: int = 8, prices: dict[str, tuple[float, float]] = DEFAULT_PRICES, org=None,
+             ledger_path=None) -> Turn:
     """chat(tier, messages) -> Completion. Pass None for a dry run (no model call, prompt only).
     org: a palace.adapters.zetaris.Zetaris, or None to answer from memory alone. It is read-only, and it is
     queried in dry runs too, so the preview shows the real records that would be sent."""
-    mems = memory.search(question, limit=limit)
+    mems, superseded, trace = hmem_rank(question, memory.search(question, limit=limit), ledger_path)
     plan = org_plan(question) if org is not None else []
     records, texts, status = fetch_records(org, plan)
     r = route(question, len(mems))
-    prompt = build_prompt(question, mems, texts, status)
+    prompt = build_prompt(question, mems, texts, status, superseded)
     turn = Turn(question, r, mems, prompt,
                 egress=[{"id": m.id, "chars": min(len(m.text), MAX_SNIPPET)} for m in mems],
-                plan=plan, records=records, org_status=status,
+                plan=plan, records=records, org_status=status, superseded=superseded, hmem=trace,
                 record_egress=[{"id": rs.id, "rows": min(len(rs.rows), MAX_RECORD_ROWS), "row_count": rs.row_count,
                                 "chars": len(t), "latency_ms": rs.latency_ms} for rs, t in zip(records, texts)])
     if chat is not None:

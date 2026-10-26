@@ -154,7 +154,7 @@ footer a { color: var(--muted); }
   function renderEgress(t) {
     const e = t.egress, snip = e.snippets.reduce((a, s) => a + s.chars, 0);
     const mems = t.memories.map((m) => `<div class="mem" data-id="${esc(m.id)}"><b>[${esc(m.id)}${m.date ? ", " + esc(m.date) : ""}]</b>
-      <span class="where">${esc(m.wing)}/${esc(m.room)} · score ${esc(m.score)}</span><br>${esc(m.text.slice(0, 600))}</div>`).join("");
+      <span class="where">${esc(m.wing)}/${esc(m.room)} · score ${esc(m.score)}${t.hmem && t.hmem.superseded[m.id] ? ` · <b>superseded by ${esc(t.hmem.superseded[m.id])}</b> (H-MEM)` : ""}</span><br>${esc(m.text.slice(0, 600))}</div>`).join("");
     const z = t.zetaris || { status: null, records: [] };
     const recs = z.records.map((r) => `<div class="mem" data-id="${esc(r.id)}"><b>[${esc(r.id)}]</b>
       <span class="where">Zetaris · ${esc(r.template)} · ${esc(r.row_count)} rows · ${esc(r.latency_ms)} ms</span><br>${esc(r.why)}

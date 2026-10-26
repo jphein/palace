@@ -48,6 +48,7 @@ def turn_to_dict(turn: Turn, cfg: Config, live: bool) -> dict:
         "route": {"tier": turn.route.tier, "reason": turn.route.reason, "model": cfg.active_models[turn.route.tier]},
         "provider": turn.provider or cfg.provider,
         "receipt_id": turn.receipt_id,
+        "hmem": {**(turn.hmem or {}), "superseded": turn.superseded},
         "answer": turn.answer,
         "model": turn.model,
         "usage": turn.usage,

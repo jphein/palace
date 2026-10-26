@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import os
 import json
 import sys
 from pathlib import Path
@@ -29,11 +30,12 @@ def cmd_ask(cfg: Config, args) -> int:
         org = open_zetaris()
     except ZetarisOffline as e:
         org = Unreachable(e)
-    turn = run_turn(args.question, memory, chat, prices=cfg.prices, org=org)
+    turn = run_turn(args.question, memory, chat, prices=cfg.prices, org=org,
+                    ledger_path=os.environ.get("PALACE_TRUST_LEDGER") or None)
     if args.json:
         print(json.dumps({"route": turn.route.__dict__, "egress": turn.egress, "answer": turn.answer, "model": turn.model,
                           "usage": turn.usage, "cost_usd": turn.cost_usd, "provider": turn.provider,
-                          "receipt_id": turn.receipt_id,
+                          "receipt_id": turn.receipt_id, "hmem": {**(turn.hmem or {}), "superseded": turn.superseded},
                           "memories": [m.__dict__ for m in turn.memories],
                           "zetaris": {"status": turn.org_status, "plan": [s.__dict__ for s in turn.plan],
                                       "egress": turn.record_egress,
@@ -44,7 +46,10 @@ def cmd_ask(cfg: Config, args) -> int:
     sent += [f"{e['id']} ({e['rows']} rows, {e['chars']} chars)" for e in turn.record_egress]
     print("what leaves the house: " + (", ".join(sent) or "nothing"))
     for m in turn.memories:
-        print(f"  {m.cite()} {m.wing}/{m.room}: {m.text[:100]}")
+        sup = f" (superseded by {turn.superseded[m.id]})" if m.id in turn.superseded else ""
+        print(f"  {m.cite()} {m.wing}/{m.room}{sup}: {m.text[:100]}")
+    if turn.hmem:
+        print(f"h-mem: {turn.hmem['retrievalReason']}; ledger {turn.hmem['ledger']}")
     if turn.org_status:
         print(f"zetaris: {turn.org_status}")
     for step, rs in zip(turn.plan, turn.records):
