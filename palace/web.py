@@ -45,7 +45,9 @@ def turn_to_dict(turn: Turn, cfg: Config, live: bool) -> dict:
     return {
         "question": turn.question,
         "mode": "live" if live else "preview",
-        "route": {"tier": turn.route.tier, "reason": turn.route.reason, "model": cfg.models[turn.route.tier]},
+        "route": {"tier": turn.route.tier, "reason": turn.route.reason, "model": cfg.active_models[turn.route.tier]},
+        "provider": turn.provider or cfg.provider,
+        "receipt_id": turn.receipt_id,
         "answer": turn.answer,
         "model": turn.model,
         "usage": turn.usage,
@@ -53,7 +55,7 @@ def turn_to_dict(turn: Turn, cfg: Config, live: bool) -> dict:
         "memories": [{"id": m.id, "date": m.date, "wing": m.wing, "room": m.room, "text": m.text, "score": m.score}
                      for m in turn.memories],
         "egress": {
-            "destination": urlparse(cfg.base_url).hostname,
+            "destination": cfg.model_host,
             "sent": live,
             "snippets": [{**e, "date": by_id[e["id"]].date} for e in turn.egress],
             "records": turn.record_egress,
@@ -116,8 +118,9 @@ def make_handler(cfg: Config, memory: MemoryBackend, chat: Callable | None,
     status = {
         "mode": "live" if live else "preview",
         "memory": "palace-daemon" if isinstance(memory, DaemonMemory) else "synthetic demo palace (offline)",
-        "models": cfg.models,
-        "model_host": urlparse(cfg.base_url).hostname,
+        "models": cfg.active_models,
+        "provider": cfg.provider,
+        "model_host": cfg.model_host,
         "zetaris": "connected" if org is not None and not hasattr(org, "err") else
                    ("offline" if org is not None else "not configured"),
         "version": __version__,
@@ -187,6 +190,9 @@ def make_handler(cfg: Config, memory: MemoryBackend, chat: Callable | None,
 
 
 def build_chat(cfg: Config) -> Callable | None:
+    if cfg.provider == "meterless":
+        from .providers.meterless import Nightshift
+        return Nightshift(cfg).chat if cfg.meterless_key else None
     if not cfg.api_key:
         return None
     from .tokenfactory import TokenFactory
@@ -208,7 +214,8 @@ def serve(host: str = "127.0.0.1", port: int = 8765, cfg: Config | None = None) 
     except ValueError:
         limit = 0
     httpd = ThreadingHTTPServer((host, port), make_handler(cfg, memory, chat, HourlyCap(limit), org))
-    mode = "LIVE (Token Factory)" if chat else "PREVIEW (no NEBIUS_API_KEY: nothing is sent)"
+    via = "Meterless Nightshift" if cfg.provider == "meterless" else "Token Factory"
+    mode = f"LIVE ({via})" if chat else f"PREVIEW (no {via} key: nothing is sent)"
     print(f"palace: http://{host}:{port}/  mode={mode}  cap={limit or 'none'}/hour  "
           f"zetaris={'on' if org is not None else 'off'}", file=sys.stderr)
     try:

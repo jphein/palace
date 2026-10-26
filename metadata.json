@@ -24,12 +24,12 @@
     "meterless": {
       "engines": ["H-MEM memory layer", "World Model event log"],
       "provider": "Nightshift as the primary AI provider",
-      "status": "planned"
+      "status": "provider working; engines in progress"
     },
     "nvidia": {
       "where": "Nemotron 3 Nano / Super / Ultra answer each turn",
-      "via": ["Nebius Token Factory (pre-existing)", "Meterless Nightshift lanes (planned)"],
-      "status": "partly pre-existing"
+      "via": ["Nebius Token Factory (pre-existing)", "Meterless Nightshift's NVIDIA provider (window work)"],
+      "status": "working"
     },
     "cursor": {"where": "used for part of the window's code (optional since the organisers' 2026-10-22 change); evidence in docs/cursor-evidence/", "status": "signed in; first session pending"}
   }
