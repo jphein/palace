@@ -87,8 +87,9 @@ python3 -m palace serve                                # web chat on http://127.
 | `PALACE_FORBIDDEN_HOSTS_FILE` | One more deny-list file (default files: `~/.config/palace/forbidden-hosts`, `./.forbidden-hosts`) |
 | `PALACE_ALLOW_HOSTS` | Opts a LAN-looking **demo** daemon back in. It never overrides the deny-list |
 | `PALACE_MAX_ASKS_PER_HOUR` | `palace serve`: caps **live** model calls across all visitors (a public demo shouldn't drain your credits). Over the cap, the page falls back to a preview. Unset means no cap |
+| `PALACE_MAX_ASKS_PER_DAY` | `palace serve`: the same, over any rolling 24 hours. Use both on a public demo: the hourly cap stops a burst, the daily one bounds the total. Unset means no cap |
 
-**Container.** `docker build -t palace-nemotron .` then `docker run --rm -p 8080:8080 -e NEBIUS_API_KEY -e PALACE_MAX_ASKS_PER_HOUR=120 palace-nemotron`. The image serves the web chat on the synthetic demo palace, as a non-root user.
+**Container.** `docker build -t palace-nemotron .` then `docker run --rm -p 8080:8080 -e NEBIUS_API_KEY -e PALACE_MAX_ASKS_PER_HOUR=60 -e PALACE_MAX_ASKS_PER_DAY=200 palace-nemotron`. The image serves the web chat on the synthetic demo palace, as a non-root user.
 
 ## Evals
 
@@ -133,7 +134,7 @@ hypotheticals.
   written down, it will confidently report the old decision. It never invents one: both unanswerable eval questions
   were declined (abstain 1.0).
 - **Latency and cost** on the live eval: Nano 1.3 s mean, Super 1.7 s mean (max 4.0 s), Ultra 1.7 s mean (max 2.9 s).
-  The whole 26-question run cost $0.0102. A public demo should set `PALACE_MAX_ASKS_PER_HOUR`.
+  The whole 26-question run cost $0.0102. A public demo should set `PALACE_MAX_ASKS_PER_HOUR` and `PALACE_MAX_ASKS_PER_DAY`.
 - **The real-palace guard is a heuristic** (`palace/config.py`). It refuses hosts that look like a home server,
   which can also refuse a legitimate demo daemon on a LAN until `PALACE_ALLOW_HOSTS` opts it in.
 

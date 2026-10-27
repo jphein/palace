@@ -7,8 +7,9 @@ Routes
   GET  /api/status       mode (live | preview), memory backend, model ids, model host
   POST /api/ask          {"question": "...", "dry_run": false} -> the turn as JSON
 
-PALACE_MAX_ASKS_PER_HOUR caps LIVE model calls across all visitors (a public demo must not drain the credits);
-over the cap, /api/ask answers 429. Unset or 0 means no cap. Preview (dry-run) asks are never capped.
+PALACE_MAX_ASKS_PER_HOUR and PALACE_MAX_ASKS_PER_DAY cap LIVE model calls across all visitors (a public demo must not
+drain the credits), over any rolling hour and 24 hours; over either cap, /api/ask answers 429. Unset or 0 means that cap
+is off. Preview (dry-run) asks are never capped.
 
 With no NEBIUS_API_KEY the server runs in PREVIEW mode: it recalls and routes, and shows exactly what
 WOULD be sent to Token Factory, but makes no model call. Binds to 127.0.0.1 unless --host says otherwise."""
@@ -84,22 +85,36 @@ def version_doc() -> dict:
 
 
 class HourlyCap:
-    """At most `limit` events in any rolling hour (thread-safe). limit <= 0 means unlimited."""
+    """At most `limit` events in any rolling hour and, when per_day > 0, at most `per_day` in any rolling 24 hours
+    (thread-safe). A limit <= 0 means that limit is off. After a refusal, `refused` says which one ("hourly"|"daily")."""
 
-    def __init__(self, limit: int, clock: Callable[[], float] = time.monotonic):
-        self.limit, self.clock, self.times, self.lock = limit, clock, deque(), threading.Lock()
+    def __init__(self, limit: int, clock: Callable[[], float] = time.monotonic, per_day: int = 0):
+        self.limit, self.per_day, self.clock, self.times, self.lock = limit, per_day, clock, deque(), threading.Lock()
+        self.refused = ""
 
     def take(self) -> bool:
-        if self.limit <= 0:
+        if self.limit <= 0 and self.per_day <= 0:
             return True
+        window = 86400 if self.per_day > 0 else 3600
         with self.lock:
             now = self.clock()
-            while self.times and now - self.times[0] >= 3600:
+            while self.times and now - self.times[0] >= window:
                 self.times.popleft()
-            if len(self.times) >= self.limit:
+            if self.per_day > 0 and len(self.times) >= self.per_day:
+                self.refused = "daily"
+                return False
+            if self.limit > 0 and sum(1 for t in self.times if now - t < 3600) >= self.limit:
+                self.refused = "hourly"
                 return False
             self.times.append(now)
             return True
+
+
+def _env_int(name: str) -> int:
+    try:
+        return int(os.environ.get(name) or 0)
+    except ValueError:
+        return 0
 
 
 def make_handler(cfg: Config, memory: MemoryBackend, chat: Callable | None,
@@ -166,7 +181,7 @@ def make_handler(cfg: Config, memory: MemoryBackend, chat: Callable | None,
             use_chat = None if req.get("dry_run") else chat
             if use_chat is not None and not cap.take():
                 return self._json(HTTPStatus.TOO_MANY_REQUESTS,
-                                  {"error": "This demo's hourly limit on model calls is used up; please try again later.",
+                                  {"error": f"This demo's {cap.refused} limit on model calls is used up; please try again later.",
                                    "limit": True})
             try:
                 turn = run_turn(q, memory, use_chat, prices=cfg.prices)
@@ -189,13 +204,10 @@ def serve(host: str = "127.0.0.1", port: int = 8765, cfg: Config | None = None) 
     cfg = cfg or Config.from_env()
     memory = open_memory(cfg)
     chat = build_chat(cfg)
-    try:
-        limit = int(os.environ.get("PALACE_MAX_ASKS_PER_HOUR") or 0)
-    except ValueError:
-        limit = 0
-    httpd = ThreadingHTTPServer((host, port), make_handler(cfg, memory, chat, HourlyCap(limit)))
+    limit, per_day = _env_int("PALACE_MAX_ASKS_PER_HOUR"), _env_int("PALACE_MAX_ASKS_PER_DAY")
+    httpd = ThreadingHTTPServer((host, port), make_handler(cfg, memory, chat, HourlyCap(limit, per_day=per_day)))
     mode = "LIVE (Token Factory)" if chat else "PREVIEW (no NEBIUS_API_KEY: nothing is sent)"
-    print(f"palace: http://{host}:{port}/  mode={mode}  cap={limit or 'none'}/hour", file=sys.stderr)
+    print(f"palace: http://{host}:{port}/  mode={mode}  cap={limit or 'none'}/hour, {per_day or 'none'}/day", file=sys.stderr)
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
