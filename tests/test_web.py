@@ -120,6 +120,17 @@ def test_hourly_cap_limits_live_calls_only():
     assert cap.take()
     assert all(HourlyCap(0).take() for _ in range(100))
 
+    day = HourlyCap(0, clock=lambda: now[0], per_day=3)          # daily cap alone, over a rolling 24 h
+    assert day.take() and day.take()
+    now[0] += 7200
+    assert day.take() and not day.take() and day.refused == "daily"
+    now[0] += 86400 - 7200                                       # the first two age out, the third doesn't
+    assert day.take() and day.take() and not day.take()
+    both = HourlyCap(1, clock=lambda: now[0], per_day=2)        # both caps: the hourly one bites first
+    assert both.take() and not both.take() and both.refused == "hourly"
+    now[0] += 3600
+    assert both.take() and not both.take() and both.refused == "daily"
+
     calls = []
     cfg = Config.from_env({})
     httpd = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(
@@ -130,7 +141,7 @@ def test_hourly_cap_limits_live_calls_only():
         body = json.dumps({"question": "When is the next county report due?"}).encode()
         assert _post(base + "/api/ask", body)[0] == 200
         code, err = _post(base + "/api/ask", body)
-        assert code == 429 and err["limit"] is True and len(calls) == 1
+        assert code == 429 and err["limit"] is True and len(calls) == 1 and "hourly limit" in err["error"]
         code, t = _post(base + "/api/ask", json.dumps({"question": "When?", "dry_run": True}).encode())
         assert code == 200 and t["mode"] == "preview"     # the page's fallback still works over the cap
     finally:
