@@ -73,3 +73,18 @@ What broke or misled us, how we found it, and what we did. "Open" means it isn't
     a client made by `login()` renews its token a minute before its `exp` claim, and once more if a query is still
     refused. A client made from an API token can't renew, and the error says so. Tested on the double
     (`expire_token()`) and on our running Zetaris.
+
+## Found while making the Zetaris Demo Challenge re-cut (27 Oct)
+
+19. **`INSERT` into a FILESTORE table needs a directory path.** On a table whose `PATH` is a single CSV file, `INSERT
+    INTO … VALUES` fails with `ParentNotDirectoryException`. Recreating the table with `PATH` set to a directory that
+    holds the CSV makes `INSERT` work: Zetaris writes new `part-*` files beside it. The original single-file table
+    stays read-only, which is what Palace needs anyway.
+20. **A date column needs a typed literal.** `INSERT … VALUES ('S029', '2026-10-24', …)` fails with
+    `CANNOT_SAFELY_CAST`. `DATE '2026-10-24'` works.
+21. **Dropping a table takes Zetaris's own syntax.** `DROP TABLE` and `DROP VIEW` fail, and the REST `DELETE` on a
+    file-store table answers 405. `DROP LIGHTNING DATABASE TABLE <db>.<table>` works. We found it in the parser's
+    grammar, not the docs.
+22. **The console's History tab is per script.** Queries Palace sends over REST don't appear there, which made it look
+    as if Palace had run nothing. `GET /api/proxy/sql-editor/sqls/history` lists every query, with its SQL, status
+    and run time.
