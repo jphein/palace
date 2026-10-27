@@ -72,13 +72,14 @@ def _git(*args: str) -> str:
 
 
 def version_doc() -> dict:
-    h = _git("rev-parse", "--short", "HEAD") or "dev"
+    # In the container there is no .git: the image carries the build's sha and branch (Dockerfile ARGs).
+    h = _git("rev-parse", "--short", "HEAD") or os.environ.get("PALACE_GIT_SHA") or "dev"
     try:
         from realm_sigil import version_dict  # optional; LGPL-3.0, github.com/jphein/sigil.realm.watch
     except ImportError:
         return {"name": "palace-nemotron", "version": __version__, "hash": h, "repo": REPO}
     return version_dict("palace-nemotron", "Private personal AI on Nemotron via Nebius Token Factory", "fantasy", REPO,
-                        hash=h, branch=_git("rev-parse", "--abbrev-ref", "HEAD") or "unknown",
+                        hash=h, branch=_git("rev-parse", "--abbrev-ref", "HEAD") or os.environ.get("PALACE_GIT_BRANCH") or "unknown",
                         dirty=bool(_git("status", "--porcelain")), started=time.strftime(
                             "%Y-%m-%dT%H:%M:%SZ", time.gmtime(STARTED)), uptime=int(time.time() - STARTED),
                         runtime=f"python {sys.version.split()[0]}", pid=os.getpid())
