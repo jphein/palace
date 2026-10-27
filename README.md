@@ -48,7 +48,7 @@ called (preview)", and the panel shows exactly what *would* be sent.
 
 > Status: a working build for the Nebius x NVIDIA Global AI Hackathon (Personal AI track). Recall, routing, the
 > egress log, the CLI, the web chat and the evals work, and live answers run on Nemotron 3 Nano/Super/Ultra via
-> Token Factory (first live eval 2026-10-19; see Evals).
+> Token Factory (first live eval 2026-10-19; see Evals). Public demo: https://palace.techempower.org (since 2026-10-27).
 
 ## How it works
 
@@ -102,11 +102,12 @@ report to `evals/runs/`. Offline it scores **recall@k** (are the expected memori
 accuracy**; `--live` adds **citation validity** (does the answer cite only memories it was given?),
 **expected-citation hits**, **abstention** on unanswerable questions, and token, latency and cost totals.
 
-| Run (2026-10-19) | recall@k | tier acc. | citation valid | expected cited | abstain | tokens | cost | time |
+| Run | recall@k | tier acc. | citation valid | expected cited | abstain | tokens | cost | time |
 |---|---|---|---|---|---|---|---|---|
 | `baseline-offline` | 0.958 | 0.731 | | | | | | |
 | `live-2026-10-19` (before the fix) | 0.958 | 0.731 | 1.0* | 0.792 | 1.0 | 10,368 + 4,249 | $0.0097 | 40 s |
 | `live-2026-10-19-normalised` | 0.958 | 0.731 | 1.0 | 0.958 | 1.0 | 10,368 + 4,382 | $0.0102 | 41 s |
+| `live-2026-10-27` (re-run) | 0.958 | 0.731 | 1.0 | 0.958 | 1.0 | 10,368 + 4,735 | $0.0109 | 45 s |
 
 \*Not real evidence. Nemotron 3 Super cited 4 answers as `【demo-008】`, so the scorer saw *no* citations
 on them, and "no invented ids" was vacuous. Answers are now normalised to `[demo-008]` and the scorer
@@ -136,8 +137,8 @@ hypotheticals.
 - **Stale notes are only as good as the archive.** Palace answers from what's in the palace. If a reversal was never
   written down, it will confidently report the old decision. It never invents one: both unanswerable eval questions
   were declined (abstain 1.0).
-- **Latency and cost** on the live eval: Nano 1.3 s mean, Super 1.7 s mean (max 4.0 s), Ultra 1.7 s mean (max 2.9 s).
-  The whole 26-question run cost $0.0102. A public demo should set `PALACE_MAX_ASKS_PER_HOUR` and `PALACE_MAX_ASKS_PER_DAY`.
+- **Latency and cost** on the live evals (10/19 and 10/27): median Nano 1.3 s, Super 1.5–1.8 s (max 5.0 s), Ultra 1.4 s (max
+  2.9 s). Mean cost per answer: Nano $0.00007, Super $0.00022, Ultra $0.0013; a whole 26-question run costs about a cent. A public demo should set `PALACE_MAX_ASKS_PER_HOUR` and `PALACE_MAX_ASKS_PER_DAY`.
 - **The real-palace guard is a heuristic** (`palace/config.py`). It refuses hosts that look like a home server,
   which can also refuse a legitimate demo daemon on a LAN until `PALACE_ALLOW_HOSTS` opts it in.
 
@@ -154,13 +155,13 @@ reader.
 - **Reduced motion:** smooth scrolling is turned off when the system asks for reduced motion. Nothing else animates.
 - **No JavaScript dependencies**, and the page is a single static file.
 
-## Roadmap to submission (Oct 30, 2026)
+## Roadmap
 1. ~~Confirm the Nemotron 3 Nano/Super/Ultra ids with `palace models`; make the first real call and a live eval run.~~ (done 2026-10-19)
 2. Hermes Agent persona: expose `recall`, `remember` and `brief_me` as Hermes tools that call this turn loop.
 3. Optional: re-embed the demo wing with an NVIDIA embedding model on Token Factory; compare latency and quality.
 4. ~~Web chat with the "what leaves the house" panel (dark/light)~~ (done: `palace serve`); ~~public demo on the synthetic palace~~ (done: https://palace.techempower.org, capped at 60 live calls/hour and 200/day).
 5. Optional Tavily web-search tool.
-6. Demo video (≤3 min) naming Token Factory and Nemotron; README feedback section.
+6. ~~Demo video (≤3 min) naming Token Factory and Nemotron~~ (done 2026-10-27).
 
 ## License
 
