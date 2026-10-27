@@ -2,6 +2,9 @@
 
 **A private personal AI with a real long-term memory: it tells you what you decided, whether it changed, and shows exactly which memories it used. Answers come from NVIDIA Nemotron on Nebius Token Factory.**
 
+> This is the **Nebius × NVIDIA Global AI Hackathon** entry (branch `nebius`); the repository's default branch holds a
+> different entry. **Try it live: https://palace.techempower.org** (synthetic archive, no login).
+
 ![The starter question, live: the answer cites the July decision and the August reversal, and the panel shows which step ran where](docs/img/palace-live-starter.png)
 
 ## Who it's for
@@ -155,7 +158,7 @@ reader.
 1. ~~Confirm the Nemotron 3 Nano/Super/Ultra ids with `palace models`; make the first real call and a live eval run.~~ (done 2026-10-19)
 2. Hermes Agent persona: expose `recall`, `remember` and `brief_me` as Hermes tools that call this turn loop.
 3. Optional: re-embed the demo wing with an NVIDIA embedding model on Token Factory; compare latency and quality.
-4. ~~Web chat with the "what leaves the house" panel (dark/light)~~ (done: `palace serve`); public demo on the synthetic palace.
+4. ~~Web chat with the "what leaves the house" panel (dark/light)~~ (done: `palace serve`); ~~public demo on the synthetic palace~~ (done: https://palace.techempower.org, capped at 60 live calls/hour and 200/day).
 5. Optional Tavily web-search tool.
 6. Demo video (≤3 min) naming Token Factory and Nemotron; README feedback section.
 
